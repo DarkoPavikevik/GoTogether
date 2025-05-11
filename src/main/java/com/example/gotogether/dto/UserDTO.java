@@ -16,4 +16,5 @@ public class UserDTO {
     private Double rating;
     private String username;
     private String password;
+    private String confirmPassword;
 }

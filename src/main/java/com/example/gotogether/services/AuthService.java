@@ -28,6 +28,10 @@ public class AuthService {
             throw new IllegalArgumentException("Email already in use.");
         }
 
+        if (!dto.getPassword().equals(dto.getConfirmPassword())) {
+            throw new IllegalArgumentException("Passwords do not match.");
+        }
+
         User user = User.builder()
                 .username(dto.getUsername())
                 .email(dto.getEmail())
