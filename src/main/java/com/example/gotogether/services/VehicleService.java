@@ -41,6 +41,7 @@ public class VehicleService {
 
         Vehicle vehicle = new Vehicle();
         vehicle.setBrand(dto.getBrand());
+        vehicle.setPlateNumber(dto.getPlateNumber());
         vehicle.setModel(dto.getModel());
         vehicle.setColor(dto.getColor());
         vehicle.setSeats(dto.getSeats());
@@ -68,11 +69,32 @@ public class VehicleService {
         vehicleRepository.delete(vehicle);
     }
 
+    public VehicleDTO editVehicle(Long id, VehicleDTO dto) {
+
+        Vehicle vehicle = vehicleRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found"));
+
+
+        User user = userRepository.findById(dto.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        vehicle.setBrand(dto.getBrand());
+        vehicle.setPlateNumber(dto.getPlateNumber());
+        vehicle.setModel(dto.getModel());
+        vehicle.setColor(dto.getColor());
+        vehicle.setSeats(dto.getSeats());
+        vehicle.setUser(user);
+        Vehicle updatedVehicle = vehicleRepository.save(vehicle);
+
+        // Return the updated vehicle as a DTO
+        return mapToDTO(updatedVehicle);
+    }
+
     private VehicleDTO mapToDTO(Vehicle vehicle) {
         VehicleDTO dto = new VehicleDTO();
-        dto.setId(vehicle.getId());
         dto.setBrand(vehicle.getBrand());
         dto.setModel(vehicle.getModel());
+        dto.setPlateNumber(vehicle.getPlateNumber());
         dto.setColor(vehicle.getColor());
         dto.setSeats(vehicle.getSeats());
         dto.setUserId(vehicle.getUser().getId());

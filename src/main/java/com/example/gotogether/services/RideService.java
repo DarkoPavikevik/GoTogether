@@ -62,7 +62,8 @@ public class RideService {
         dto.setId(ride.getId());
         dto.setFromLocation(ride.getFromLocation());
         dto.setToLocation(ride.getToLocation());
-        dto.setDateTime(ride.getDateTime());
+        dto.setDate(ride.getDate());
+        dto.setTime(ride.getTime());
         dto.setPrice(ride.getPrice());
         dto.setSeatsAvailable(ride.getSeatsAvailable());
         dto.setStatus(ride.getStatus());
@@ -96,7 +97,8 @@ public class RideService {
         ride.setId(dto.getId());
         ride.setFromLocation(dto.getFromLocation());
         ride.setToLocation(dto.getToLocation());
-        ride.setDateTime(dto.getDateTime());
+        ride.setDate(dto.getDate());
+        ride.setTime(dto.getTime());
         ride.setPrice(dto.getPrice());
         ride.setSeatsAvailable(dto.getSeatsAvailable());
         ride.setStatus(dto.getStatus());
