@@ -49,7 +49,7 @@ public class AuthService {
                 )
         );
 
-        User user = userRepository.findByEmail(request.getUsername())
+        User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         String accessToken = jwtUtil.generateAccessToken(user.getEmail());

@@ -29,10 +29,10 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/api/auth/**").permitAll()  // allow register & login
-                                .anyRequest().authenticated()  // require authentication for other endpoints
+                                .requestMatchers("/api/auth/**").permitAll()
+                                .anyRequest().authenticated()
                 )
-                .csrf(csrf -> csrf.disable()) ;// Disabling CSRF for API
+                .csrf(csrf -> csrf.disable()) ;
 
 
         return http.build();
