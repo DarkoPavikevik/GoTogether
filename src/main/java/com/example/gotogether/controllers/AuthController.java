@@ -2,6 +2,7 @@ package com.example.gotogether.controllers;
 
 import com.example.gotogether.dto.AuthRequest;
 import com.example.gotogether.dto.AuthResponse;
+import com.example.gotogether.dto.SignUpDTO;
 import com.example.gotogether.dto.UserDTO;
 import com.example.gotogether.model.User;
 import com.example.gotogether.repositories.UserRepository;
@@ -25,8 +26,8 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody UserDTO userDTO) {
-        User registeredUser = authService.register(userDTO);
+    public ResponseEntity<UserDTO> register(@RequestBody SignUpDTO signUpDTO) {
+        UserDTO registeredUser = authService.register(signUpDTO);
         return ResponseEntity.ok(registeredUser);
     }
 

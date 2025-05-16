@@ -1,17 +1,16 @@
 package com.example.gotogether.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class ChatMessage {
 
@@ -20,9 +19,11 @@ public class ChatMessage {
     private Long id;
 
     @ManyToOne
+    @JsonIgnore
     private User sender;
 
     @ManyToOne
+    @JsonIgnore
     private User receiver;
 
     private String message;

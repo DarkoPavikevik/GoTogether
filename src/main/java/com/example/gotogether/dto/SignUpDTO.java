@@ -7,16 +7,15 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserDTO {
+public class SignUpDTO {
 
     private Long id;
-    private String bio;
-    private String name;
-    private String email;
-    private String role;
-    private Double rating;
     private String username;
+    private String email;
     private String phoneNumber;
-    private String profilePicture;
     private String password;
+    private String confirmPassword;
+
+
+
 }

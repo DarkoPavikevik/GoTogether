@@ -2,7 +2,9 @@ package com.example.gotogether.services;
 
 import com.example.gotogether.dto.AuthRequest;
 import com.example.gotogether.dto.AuthResponse;
+import com.example.gotogether.dto.SignUpDTO;
 import com.example.gotogether.dto.UserDTO;
+import com.example.gotogether.enums.Role;
 import com.example.gotogether.exceptions.ResourceNotFoundException;
 import com.example.gotogether.model.User;
 import com.example.gotogether.repositories.UserRepository;
@@ -23,7 +25,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
 
-    public User register(UserDTO dto) {
+    public UserDTO register(SignUpDTO dto) {
         if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email already in use.");
         }
@@ -36,10 +38,21 @@ public class AuthService {
                 .username(dto.getUsername())
                 .email(dto.getEmail())
                 .password(passwordEncoder.encode(dto.getPassword()))
+                .phoneNumber(dto.getPhoneNumber())
+                .role(Role.User)
                 .build();
 
-        return userRepository.save(user);
+        User saved = userRepository.save(user);
+
+        return UserDTO.builder()
+                .id(saved.getId())
+                .username(saved.getUsername())
+                .email(saved.getEmail())
+                .phoneNumber(saved.getPhoneNumber())
+                .role(String.valueOf(saved.getRole()))
+                .build();
     }
+
 
     public AuthResponse login(AuthRequest request) {
         Authentication auth = authenticationManager.authenticate(
@@ -52,19 +65,19 @@ public class AuthService {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        String accessToken = jwtUtil.generateAccessToken(user.getEmail());
-        String refreshToken = jwtUtil.generateRefreshToken(user.getEmail());
+        String accessToken = jwtUtil.generateAccessToken(user.getUsername());
+        String refreshToken = jwtUtil.generateRefreshToken(user.getUsername());
 
         return new AuthResponse(accessToken, refreshToken);
     }
 
     public AuthResponse refreshToken(String refreshToken) {
-        String email = jwtUtil.extractUsername(refreshToken); // renamed method
+        String username = jwtUtil.extractUsername(refreshToken); // renamed method
 
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        String newAccessToken = jwtUtil.generateAccessToken(user.getEmail());
+        String newAccessToken = jwtUtil.generateAccessToken(user.getUsername());
 
         return new AuthResponse(newAccessToken, refreshToken);
     }

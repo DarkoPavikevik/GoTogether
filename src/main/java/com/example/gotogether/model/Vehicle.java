@@ -1,12 +1,14 @@
 package com.example.gotogether.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
-@Data
+@AllArgsConstructor
 @Builder
 public class Vehicle {
 
@@ -16,6 +18,7 @@ public class Vehicle {
 
 
     @ManyToOne
+    @JsonIgnore
     private User user;
     private String brand;
     private String model;

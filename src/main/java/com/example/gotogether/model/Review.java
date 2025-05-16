@@ -1,15 +1,14 @@
 package com.example.gotogether.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class Review {
 
@@ -18,12 +17,15 @@ public class Review {
     private Long id;
 
     @ManyToOne
+    @JsonIgnore
     private User reviewer;
 
     @ManyToOne
+    @JsonIgnore
     private User reviewedUser;
 
     @ManyToOne
+    @JsonIgnore
     private Ride ride;
 
     private int rating;

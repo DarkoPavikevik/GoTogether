@@ -1,8 +1,12 @@
 package com.example.gotogether.dto;
 
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class AuthRequest {
     private String username;
     private String password;

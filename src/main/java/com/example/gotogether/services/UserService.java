@@ -1,8 +1,11 @@
 package com.example.gotogether.services;
 
 import com.example.gotogether.dto.UserDTO;
+import com.example.gotogether.dto.VehicleDTO;
 import com.example.gotogether.enums.Role;
+import com.example.gotogether.exceptions.ResourceNotFoundException;
 import com.example.gotogether.model.User;
+import com.example.gotogether.model.Vehicle;
 import com.example.gotogether.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,20 +28,37 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    // Or if you prefer to throw exception when not found:
-    public User getUserEntityById(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-    }
 
     public UserDTO mapToDto(User user) {
         UserDTO dto = new UserDTO();
         dto.setId(user.getId());
+        dto.setUsername(user.getUsername());
+        dto.setPassword(user.getPassword());
+        dto.setProfilePicture(user.getProfilePicture());
+        dto.setPhoneNumber(user.getPhoneNumber());
+        dto.setBio(user.getBio());
         dto.setName(user.getName());
         dto.setEmail(user.getEmail());
         dto.setRole(String.valueOf(user.getRole()));
         dto.setRating(user.getRating());
         return dto;
+    }
+
+
+    public UserDTO editProfile(Long id, UserDTO dto) {
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+
+        user.setUsername(dto.getUsername());
+        user.setEmail(dto.getEmail());
+        user.setBio(dto.getBio());
+        user.setPhoneNumber(dto.getPhoneNumber());
+        user.setProfilePicture(dto.getProfilePicture());
+        User updatedVehicle = userRepository.save(user);
+
+        return mapToDto(updatedVehicle);
     }
 
 
@@ -55,15 +75,5 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    public UserDTO createUser(UserDTO userDTO) {
-        User user = User.builder()
-                .name(userDTO.getName())
-                .email(userDTO.getEmail())
-                .password("TEMP") // Replace with encoded password in real logic
-                .role(Role.valueOf(userDTO.getRole()))
-                .rating(5.0)
-                .build();
-        return mapToDto(userRepository.save(user));
-    }
 
 }

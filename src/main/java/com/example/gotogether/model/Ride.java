@@ -1,10 +1,8 @@
 package com.example.gotogether.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -12,9 +10,10 @@ import java.time.LocalTime;
 import java.util.List;
 
 @Entity
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class Ride {
 
@@ -24,6 +23,7 @@ public class Ride {
 
     @ManyToOne
     @JoinColumn(name = "driver_id")
+    @JsonIgnore
     private User driver;
 
     @ManyToOne
@@ -45,6 +45,7 @@ public class Ride {
     private String notes;
 
     @OneToMany(mappedBy = "ride")
+    @JsonIgnore
     private List<Booking> bookings;
 
     public Ride(Long id) {
