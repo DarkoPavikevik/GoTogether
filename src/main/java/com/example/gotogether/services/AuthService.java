@@ -65,7 +65,7 @@ public class AuthService {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        String accessToken = jwtUtil.generateAccessToken(user.getUsername());
+        String accessToken = jwtUtil.generateAccessToken(user);
         String refreshToken = jwtUtil.generateRefreshToken(user.getUsername());
 
         return new AuthResponse(accessToken, refreshToken);
@@ -77,7 +77,7 @@ public class AuthService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        String newAccessToken = jwtUtil.generateAccessToken(user.getUsername());
+        String newAccessToken = jwtUtil.generateAccessToken(user);
 
         return new AuthResponse(newAccessToken, refreshToken);
     }
