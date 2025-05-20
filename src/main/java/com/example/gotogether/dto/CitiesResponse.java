@@ -9,7 +9,7 @@ import java.util.List;
 public class CitiesResponse {
 
     private boolean error;
-    private String message;
+    private String msg;
     private List<String> data;
 }
 

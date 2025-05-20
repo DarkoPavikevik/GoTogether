@@ -21,23 +21,17 @@ public class CityService {
     }
 
 
+
     public List<String> getCitiesForCountry(String country) {
-        String url = "https://countriesnow.space/api/v0.1/countries/cities";
-        Map<String, String> request = Map.of("country", country);
+        String url = "https://countriesnow.space/api/v0.1/countries/cities/q?country=" + country;
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+        // No request body needed, it's a GET request now
+        ResponseEntity<CitiesResponse> response = restTemplate.getForEntity(url, CitiesResponse.class);
 
-        HttpEntity<Map<String, String>> entity = new HttpEntity<>(request, headers);
+        System.out.println("Status code: " + response.getStatusCode());
+        System.out.println("Body: " + response.getBody());
 
-        ResponseEntity<CitiesResponse> response = restTemplate.exchange(
-                url,
-                HttpMethod.POST,
-                entity,
-                CitiesResponse.class
-        );
-
-        return response.getBody().getData();
+        return response.getBody() != null ? response.getBody().getData() : List.of();
     }
 
 
