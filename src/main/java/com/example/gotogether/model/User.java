@@ -1,10 +1,13 @@
 package com.example.gotogether.model;
 
 import com.example.gotogether.enums.Role;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -39,7 +42,7 @@ public class User {
     private String password; // hashed password
 
     @Enumerated(EnumType.STRING)
-    private Role role; // Enum: PASSENGER, DRIVER, ADMIN
+    private Role role;
 
     private Double rating = 0.0;
 
@@ -47,10 +50,11 @@ public class User {
 
     private String profilePicture;
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate created;
 
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    @JsonIgnore
     private Set<Vehicle> vehicles = new HashSet<>();
 
     @OneToMany(mappedBy = "driver", cascade = CascadeType.ALL)
@@ -58,8 +62,14 @@ public class User {
     private Set<Ride> rides = new HashSet<>();
 
 
+
     public User(Long id) {
         this.id = id;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        this.created = LocalDate.now();
     }
 
 

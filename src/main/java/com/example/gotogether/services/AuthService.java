@@ -50,6 +50,7 @@ public class AuthService {
                 .email(saved.getEmail())
                 .phoneNumber(saved.getPhoneNumber())
                 .role(String.valueOf(saved.getRole()))
+                .created(saved.getCreated())
                 .build();
     }
 

@@ -27,7 +27,6 @@ public class CityService {
 
         // No request body needed, it's a GET request now
         ResponseEntity<CitiesResponse> response = restTemplate.getForEntity(url, CitiesResponse.class);
-
         System.out.println("Status code: " + response.getStatusCode());
         System.out.println("Body: " + response.getBody());
 

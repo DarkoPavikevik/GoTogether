@@ -82,6 +82,7 @@ public class VehicleService {
         vehicle.setPlateNumber(dto.getPlateNumber());
         vehicle.setModel(dto.getModel());
         vehicle.setColor(dto.getColor());
+        vehicle.setYear(dto.getYear());
         vehicle.setSeats(dto.getSeats());
         vehicle.setUser(user);
         Vehicle updatedVehicle = vehicleRepository.save(vehicle);

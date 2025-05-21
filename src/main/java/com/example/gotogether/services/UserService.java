@@ -28,12 +28,27 @@ public class UserService {
         return userRepository.findById(id);
     }
 
+    public UserDTO editUser(Long id,UserDTO userDTO) {
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found"));
+
+        user.setProfilePicture(userDTO.getProfilePicture());
+        user.setName(userDTO.getName());
+        user.setEmail(userDTO.getEmail());
+        user.setBio(userDTO.getBio());
+
+        User savedUser = userRepository.save(user);
+
+        return mapToDto(savedUser);
+
+    }
+
 
     public UserDTO mapToDto(User user) {
         UserDTO dto = new UserDTO();
         dto.setId(user.getId());
         dto.setUsername(user.getUsername());
-        dto.setPassword(user.getPassword());
         dto.setProfilePicture(user.getProfilePicture());
         dto.setPhoneNumber(user.getPhoneNumber());
         dto.setBio(user.getBio());

@@ -22,8 +22,9 @@ public class Vehicle {
     private User user;
     private String brand;
     private String model;
+    private Integer year;
     private String plateNumber;
-    private int seats;
+    private Integer seats;
     private String color;
 
 

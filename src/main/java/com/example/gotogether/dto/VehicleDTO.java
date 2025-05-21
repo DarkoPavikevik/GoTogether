@@ -19,6 +19,7 @@ public class VehicleDTO {
     private String brand;
     private String model;
     private String plateNumber;
-    private int seats;
+    private Integer seats;
+    private Integer year ;
     private String color;
 }

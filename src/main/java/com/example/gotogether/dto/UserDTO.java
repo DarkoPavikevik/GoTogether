@@ -1,6 +1,10 @@
 package com.example.gotogether.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
+
+import java.time.LocalDate;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -14,6 +18,8 @@ public class UserDTO {
     private String name;
     private String email;
     private String role;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate created;
     private Double rating;
     private String username;
     private String phoneNumber;
