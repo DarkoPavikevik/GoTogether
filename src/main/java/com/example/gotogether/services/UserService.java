@@ -28,21 +28,28 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public UserDTO editUser(Long id,UserDTO userDTO) {
-
+    public UserDTO editUser(Long id, UserDTO userDTO) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        user.setProfilePicture(userDTO.getProfilePicture());
-        user.setName(userDTO.getName());
-        user.setEmail(userDTO.getEmail());
-        user.setBio(userDTO.getBio());
+        if (userDTO.getProfilePicture() != null) {
+            user.setProfilePicture(userDTO.getProfilePicture());
+        }
+        if (userDTO.getName() != null) {
+            user.setName(userDTO.getName());
+        }
+        if (userDTO.getEmail() != null) {
+            user.setEmail(userDTO.getEmail());
+        }
+        if (userDTO.getBio() != null) {
+            user.setBio(userDTO.getBio());
+        }
 
         User savedUser = userRepository.save(user);
 
         return mapToDto(savedUser);
-
     }
+
 
 
     public UserDTO mapToDto(User user) {

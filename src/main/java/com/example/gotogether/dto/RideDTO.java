@@ -1,5 +1,8 @@
 package com.example.gotogether.dto;
 
+import com.example.gotogether.enums.Currency;
+import com.example.gotogether.enums.LuggageSize;
+import com.example.gotogether.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,8 +20,7 @@ import java.util.List;
 public class RideDTO {
 
     private Long id;
-    private UserInfoDTO driver;
-    private VehicleDTO vehicle;
+    private Long userId;
     private String fromLocation;
     private String toLocation;
     private LocalDate date;
@@ -26,7 +28,8 @@ public class RideDTO {
     private double price;
     private int seatsAvailable;
     private String status;
-    private String baggageInfo;
+    private LuggageSize luggageSize;
+    private Currency currency;
     private List<String> waypoints;
     private String notes;
 }

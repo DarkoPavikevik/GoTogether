@@ -8,6 +8,7 @@ import com.example.gotogether.model.Ride;
 import com.example.gotogether.model.User;
 import com.example.gotogether.model.Vehicle;
 import com.example.gotogether.repositories.RideRepository;
+import com.example.gotogether.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,9 @@ public class RideService {
 
     @Autowired
     private final RideRepository rideRepository;
+
+    @Autowired
+    private final UserRepository userRepository;
 
     public List<RideDTO> getAllRides() {
         return rideRepository.findAll().stream()
@@ -65,29 +69,16 @@ public class RideService {
         dto.setDate(ride.getDate());
         dto.setTime(ride.getTime());
         dto.setPrice(ride.getPrice());
+        dto.setCurrency(ride.getCurrency());
+        dto.setLuggageSize(ride.getLuggageSize());
         dto.setSeatsAvailable(ride.getSeatsAvailable());
         dto.setStatus(ride.getStatus());
-        dto.setBaggageInfo(ride.getBaggageInfo());
         dto.setWaypoints(ride.getWaypoints());
         dto.setNotes(ride.getNotes());
-
         if (ride.getDriver() != null) {
-            UserInfoDTO userInfoDTO = new UserInfoDTO();
-            userInfoDTO.setId(ride.getDriver().getId());
-            userInfoDTO.setName(ride.getDriver().getName());
-            userInfoDTO.setRating(ride.getDriver().getRating());
-            dto.setDriver(userInfoDTO);
+            dto.setUserId(ride.getDriver().getId());
         }
 
-        if (ride.getVehicle() != null) {
-            VehicleDTO vehicleDTO = new VehicleDTO();
-            vehicleDTO.setId(ride.getVehicle().getId());
-            vehicleDTO.setBrand(ride.getVehicle().getBrand());
-            vehicleDTO.setModel(ride.getVehicle().getModel());
-            vehicleDTO.setPlateNumber(ride.getVehicle().getPlateNumber());
-            vehicleDTO.setSeats(ride.getVehicle().getSeats());
-            dto.setVehicle(vehicleDTO);
-        }
 
         return dto;
     }
@@ -102,21 +93,15 @@ public class RideService {
         ride.setPrice(dto.getPrice());
         ride.setSeatsAvailable(dto.getSeatsAvailable());
         ride.setStatus(dto.getStatus());
-        ride.setBaggageInfo(dto.getBaggageInfo());
+        ride.setLuggageSize(dto.getLuggageSize());
+        ride.setCurrency(dto.getCurrency());
         ride.setWaypoints(dto.getWaypoints());
         ride.setNotes(dto.getNotes());
 
-        if (dto.getDriver() != null) {
-            // Only setting ID – assuming JPA will manage the relationship
-            var driver = new User();
-            driver.setId(dto.getDriver().getId());
-            ride.setDriver(driver);
-        }
-
-        if (dto.getVehicle() != null) {
-            var vehicle = new Vehicle();
-            vehicle.setId(dto.getVehicle().getId());
-            ride.setVehicle(vehicle);
+        if (dto.getUserId() != null) {
+            User user = userRepository.findById(dto.getUserId())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+            ride.setUser(user);
         }
 
         return ride;
