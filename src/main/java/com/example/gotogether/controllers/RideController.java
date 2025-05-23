@@ -3,6 +3,10 @@ package com.example.gotogether.controllers;
 import com.example.gotogether.dto.RideDTO;
 import com.example.gotogether.services.RideService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +36,21 @@ public class RideController {
     public ResponseEntity<Void> deleteRide(@PathVariable Long id) {
         rideService.deleteRide(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("")
+    public Page<RideDTO> getRides(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "price") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction
+    ) {
+        Sort sort = direction.equalsIgnoreCase("asc") ?
+                Sort.by(sortBy).ascending() :
+                Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return rideService.getAllRides(pageable);
     }
 
 }

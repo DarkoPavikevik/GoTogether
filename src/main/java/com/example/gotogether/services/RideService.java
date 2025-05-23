@@ -11,6 +11,9 @@ import com.example.gotogether.repositories.RideRepository;
 import com.example.gotogether.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,6 +40,12 @@ public class RideService {
                 .orElseThrow(() -> new ResourceNotFoundException("Ride not found with id " + id));
         return mapToDTO(ride);
     }
+
+    public Page<RideDTO> getAllRides(Pageable pageable) {
+        return rideRepository.findAll(pageable)
+                .map(this::mapToDTO);
+    }
+
 
     public RideDTO createRide(RideDTO rideDTO) {
         Ride ride = mapToEntity(rideDTO);
