@@ -50,12 +50,14 @@ public class User {
 
     private String profilePicture;
 
+    private Integer numberOfRides = 0;
+
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate created;
 
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<Vehicle> vehicles = new HashSet<>();
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Vehicle vehicle;
 
     @OneToMany(mappedBy = "driver", cascade = CascadeType.ALL)
     @JsonIgnore

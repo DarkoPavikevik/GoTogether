@@ -20,7 +20,7 @@ import java.util.List;
 public class RideDTO {
 
     private Long id;
-    private Long userId;
+    private UserInfoDTO userInfo;
     private String fromLocation;
     private String toLocation;
     private LocalDate date;

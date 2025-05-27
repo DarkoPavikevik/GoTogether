@@ -17,7 +17,7 @@ public class Vehicle {
     private Long id;
 
 
-    @ManyToOne
+    @OneToOne
     @JsonIgnore
     private User user;
     private String brand;

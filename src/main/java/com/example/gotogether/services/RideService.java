@@ -1,5 +1,6 @@
 package com.example.gotogether.services;
 
+import com.example.gotogether.dto.PopularRouteDTO;
 import com.example.gotogether.dto.RideDTO;
 import com.example.gotogether.dto.UserInfoDTO;
 import com.example.gotogether.dto.VehicleDTO;
@@ -14,10 +15,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.example.gotogether.model.RideSpecification.*;
 
 @Service
 @RequiredArgsConstructor
@@ -48,7 +53,15 @@ public class RideService {
 
 
     public RideDTO createRide(RideDTO rideDTO) {
+        User driver = userRepository.findById(rideDTO.getUserInfo().getId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + rideDTO.getUserInfo().getId()));
+
+        driver.setNumberOfRides(driver.getNumberOfRides() + 1);
+        userRepository.save(driver);
+
         Ride ride = mapToEntity(rideDTO);
+        ride.setDriver(driver);
+
         Ride saved = rideRepository.save(ride);
         return mapToDTO(saved);
     }
@@ -71,25 +84,35 @@ public class RideService {
     }
 
     private RideDTO mapToDTO(Ride ride) {
-        RideDTO dto = new RideDTO();
-        dto.setId(ride.getId());
-        dto.setFromLocation(ride.getFromLocation());
-        dto.setToLocation(ride.getToLocation());
-        dto.setDate(ride.getDate());
-        dto.setTime(ride.getTime());
-        dto.setPrice(ride.getPrice());
-        dto.setCurrency(ride.getCurrency());
-        dto.setLuggageSize(ride.getLuggageSize());
-        dto.setSeatsAvailable(ride.getSeatsAvailable());
-        dto.setStatus(ride.getStatus());
-        dto.setWaypoints(ride.getWaypoints());
-        dto.setNotes(ride.getNotes());
+        UserInfoDTO userInfoDTO = null;
+
         if (ride.getDriver() != null) {
-            dto.setUserId(ride.getDriver().getId());
+            User driver = ride.getDriver();
+            userInfoDTO = UserInfoDTO.builder()
+                    .id(driver.getId())
+                    .name(driver.getUsername())
+                    .avatar(driver.getProfilePicture())
+                    .vehicle(driver.getVehicle().getBrand())
+                    .rating(String.valueOf(driver.getRating()))
+                    .numberOfRides(driver.getNumberOfRides())
+                    .build();
         }
 
-
-        return dto;
+        return RideDTO.builder()
+                .id(ride.getId())
+                .userInfo(userInfoDTO)
+                .fromLocation(ride.getFromLocation())
+                .toLocation(ride.getToLocation())
+                .date(ride.getDate())
+                .time(ride.getTime())
+                .price(ride.getPrice())
+                .seatsAvailable(ride.getSeatsAvailable())
+                .status(ride.getStatus())
+                .luggageSize(ride.getLuggageSize())
+                .currency(ride.getCurrency())
+                .waypoints(ride.getWaypoints())
+                .notes(ride.getNotes())
+                .build();
     }
 
     public Ride mapToEntity(RideDTO dto) {
@@ -107,12 +130,22 @@ public class RideService {
         ride.setWaypoints(dto.getWaypoints());
         ride.setNotes(dto.getNotes());
 
-        if (dto.getUserId() != null) {
-            User user = userRepository.findById(dto.getUserId())
-                    .orElseThrow(() -> new RuntimeException("User not found"));
-            ride.setUser(user);
-        }
 
         return ride;
+    }
+
+
+    public Page<RideDTO> searchRides(String from, String to, LocalDate date, Pageable pageable) {
+        Specification<Ride> spec = Specification.where(hasFromLocation(from))
+                .and(hasToLocation(to))
+                .and(hasDate(date));
+
+        return rideRepository.findAll(spec, pageable)
+                .map(this::mapToDTO);
+    }
+
+    public List<PopularRouteDTO> getTopPopularRoutes(int limit) {
+        Pageable pageable = PageRequest.of(0, limit);
+        return rideRepository.findTopPopularRoutes(pageable);
     }
 }

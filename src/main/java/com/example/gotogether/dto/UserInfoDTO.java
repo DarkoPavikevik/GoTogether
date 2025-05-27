@@ -12,5 +12,8 @@ import lombok.NoArgsConstructor;
 public class UserInfoDTO {
     private Long id;
     private String name;
-    private double rating;
+    private String avatar;
+    private String vehicle;
+    private String rating;
+    private Integer numberOfRides;
 }
