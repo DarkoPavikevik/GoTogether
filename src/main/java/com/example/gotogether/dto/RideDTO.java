@@ -21,6 +21,7 @@ public class RideDTO {
 
     private Long id;
     private UserInfoDTO userInfo;
+    private RideEstimateResponseDTO estimate;
     private String fromLocation;
     private String toLocation;
     private LocalDate date;
@@ -32,4 +33,5 @@ public class RideDTO {
     private Currency currency;
     private List<String> waypoints;
     private String notes;
+
 }

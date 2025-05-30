@@ -1,13 +1,11 @@
 package com.example.gotogether.services;
 
-import com.example.gotogether.dto.PopularRouteDTO;
-import com.example.gotogether.dto.RideDTO;
-import com.example.gotogether.dto.UserInfoDTO;
-import com.example.gotogether.dto.VehicleDTO;
+import com.example.gotogether.dto.*;
+import com.example.gotogether.enums.Currency;
+import com.example.gotogether.enums.LuggageSize;
 import com.example.gotogether.exceptions.ResourceNotFoundException;
 import com.example.gotogether.model.Ride;
 import com.example.gotogether.model.User;
-import com.example.gotogether.model.Vehicle;
 import com.example.gotogether.repositories.RideRepository;
 import com.example.gotogether.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +17,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,6 +32,9 @@ public class RideService {
 
     @Autowired
     private final UserRepository userRepository;
+
+    @Autowired
+    private final RouteService routeService; // Inject routeService here
 
     public List<RideDTO> getAllRides() {
         return rideRepository.findAll().stream()
@@ -50,7 +52,6 @@ public class RideService {
         return rideRepository.findAll(pageable)
                 .map(this::mapToDTO);
     }
-
 
     public RideDTO createRide(RideDTO rideDTO) {
         User driver = userRepository.findById(rideDTO.getUserInfo().getId())
@@ -71,7 +72,7 @@ public class RideService {
                 .orElseThrow(() -> new ResourceNotFoundException("Ride not found with id " + id));
 
         Ride rideToUpdate = mapToEntity(rideDTO);
-        rideToUpdate.setId(id); // Ensure the ID is preserved
+        rideToUpdate.setId(id);
         Ride updated = rideRepository.save(rideToUpdate);
         return mapToDTO(updated);
     }
@@ -98,9 +99,24 @@ public class RideService {
                     .build();
         }
 
+        // Prepare cities list
+        List<String> cities = new ArrayList<>();
+        cities.add(ride.getFromLocation());
+        if (ride.getWaypoints() != null && !ride.getWaypoints().isEmpty()) {
+            cities.addAll(ride.getWaypoints());
+        }
+        cities.add(ride.getToLocation());
+
+        // Estimate
+        List<String> arrivalTimes = routeService.getEstimatedArrivalTimes(cities, ride.getTime());
+        RideEstimateResponseDTO estimate = RideEstimateResponseDTO.builder()
+                .estimatedArrivalTimes(arrivalTimes)
+                .build();
+
         return RideDTO.builder()
                 .id(ride.getId())
                 .userInfo(userInfoDTO)
+                .estimate(estimate)
                 .fromLocation(ride.getFromLocation())
                 .toLocation(ride.getToLocation())
                 .date(ride.getDate())
@@ -130,10 +146,8 @@ public class RideService {
         ride.setWaypoints(dto.getWaypoints());
         ride.setNotes(dto.getNotes());
 
-
         return ride;
     }
-
 
     public Page<RideDTO> searchRides(String from, String to, LocalDate date, Pageable pageable) {
         Specification<Ride> spec = Specification.where(hasFromLocation(from))
