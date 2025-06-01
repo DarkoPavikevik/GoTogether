@@ -6,6 +6,7 @@ import com.example.gotogether.enums.LuggageSize;
 import com.example.gotogether.exceptions.ResourceNotFoundException;
 import com.example.gotogether.model.Ride;
 import com.example.gotogether.model.User;
+import com.example.gotogether.model.Vehicle;
 import com.example.gotogether.repositories.RideRepository;
 import com.example.gotogether.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,7 @@ public class RideService {
     private final UserRepository userRepository;
 
     @Autowired
-    private final RouteService routeService; // Inject routeService here
+    private final RouteService routeService;
 
     public List<RideDTO> getAllRides() {
         return rideRepository.findAll().stream()
@@ -86,6 +87,7 @@ public class RideService {
 
     private RideDTO mapToDTO(Ride ride) {
         UserInfoDTO userInfoDTO = null;
+        VehicleDTO vehicleDTO = null;
 
         if (ride.getDriver() != null) {
             User driver = ride.getDriver();
@@ -98,6 +100,23 @@ public class RideService {
                     .numberOfRides(driver.getNumberOfRides())
                     .build();
         }
+
+        VehicleDTO vechicleDTO = null;
+        if (ride.getDriver() != null && ride.getDriver().getVehicle() != null) {
+            Vehicle vehicle = ride.getDriver().getVehicle();
+            vehicleDTO = VehicleDTO.builder()
+                    .id(vehicle.getId())
+                    .userId(vehicle.getUser().getId())
+                    .brand(vehicle.getBrand())
+                    .model(vehicle.getModel())
+                    .year(vehicle.getYear())
+                    .color(vehicle.getColor())
+                    .plateNumber(vehicle.getPlateNumber())
+                    .seats(vehicle.getSeats())
+                    .build();
+        }
+
+
 
         // Prepare cities list
         List<String> cities = new ArrayList<>();
@@ -116,6 +135,7 @@ public class RideService {
         return RideDTO.builder()
                 .id(ride.getId())
                 .userInfo(userInfoDTO)
+                .vehicleDTO(vehicleDTO)
                 .estimate(estimate)
                 .fromLocation(ride.getFromLocation())
                 .toLocation(ride.getToLocation())
