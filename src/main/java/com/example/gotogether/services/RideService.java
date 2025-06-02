@@ -122,6 +122,7 @@ public class RideService {
                     .id(vehicle.getId())
                     .userId(vehicle.getUser().getId())
                     .brand(vehicle.getBrand())
+                    .picture(vehicle.getPicture())
                     .model(vehicle.getModel())
                     .year(vehicle.getYear())
                     .color(vehicle.getColor())
