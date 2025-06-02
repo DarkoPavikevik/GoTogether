@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,6 +17,7 @@ public class ReviewDTO {
     private int rating;
     private Long reviewerId;
     private Long reviewedUserId;
-    private Long rideId;
+    private LocalDate commentDate;
+
 }
 

@@ -1,8 +1,11 @@
 package com.example.gotogether.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -30,6 +33,9 @@ public class Review {
 
     private int rating;
     private String comment;
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate commentDate;
 
 
     public Review(Long id) {

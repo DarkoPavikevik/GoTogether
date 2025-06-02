@@ -4,6 +4,7 @@ import com.example.gotogether.dto.*;
 import com.example.gotogether.enums.Currency;
 import com.example.gotogether.enums.LuggageSize;
 import com.example.gotogether.exceptions.ResourceNotFoundException;
+import com.example.gotogether.model.Review;
 import com.example.gotogether.model.Ride;
 import com.example.gotogether.model.User;
 import com.example.gotogether.repositories.RideRepository;
@@ -89,6 +90,18 @@ public class RideService {
 
         if (ride.getDriver() != null) {
             User driver = ride.getDriver();
+
+            // Convert driver's reviews to DTOs
+            List<ReviewDTO> reviewDTOs = driver.getReviews().stream()
+                    .map(review -> ReviewDTO.builder()
+                            .id(review.getId())
+                            .reviewerId(review.getId()) // assuming this field exists
+                            .commentDate(review.getCommentDate())
+                            .comment(review.getComment())
+                            .rating(review.getRating())
+                            .build())
+                    .collect(Collectors.toList());
+
             userInfoDTO = UserInfoDTO.builder()
                     .id(driver.getId())
                     .name(driver.getUsername())
@@ -96,6 +109,7 @@ public class RideService {
                     .vehicle(driver.getVehicle().getBrand())
                     .rating(String.valueOf(driver.getRating()))
                     .numberOfRides(driver.getNumberOfRides())
+                    .reviews(reviewDTOs) // include the driver's reviews
                     .build();
         }
 
@@ -131,6 +145,7 @@ public class RideService {
                 .build();
     }
 
+
     public Ride mapToEntity(RideDTO dto) {
         Ride ride = new Ride();
         ride.setId(dto.getId());
@@ -145,7 +160,6 @@ public class RideService {
         ride.setCurrency(dto.getCurrency());
         ride.setWaypoints(dto.getWaypoints());
         ride.setNotes(dto.getNotes());
-
         return ride;
     }
 
@@ -162,4 +176,6 @@ public class RideService {
         Pageable pageable = PageRequest.of(0, limit);
         return rideRepository.findTopPopularRoutes(pageable);
     }
+
+
 }

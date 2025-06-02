@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,4 +18,5 @@ public class UserInfoDTO {
     private String vehicle;
     private String rating;
     private Integer numberOfRides;
+    private List<ReviewDTO> reviews;
 }

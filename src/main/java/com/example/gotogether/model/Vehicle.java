@@ -24,8 +24,13 @@ public class Vehicle {
     private String model;
     private Integer year;
     private String plateNumber;
+    private String picture;
     private Integer seats;
     private String color;
+    private Boolean airCondition = false;
+    private Boolean usbCharging = false;
+    private Boolean music = false;
+    private Boolean comfortableSeats = false;
 
 
     public void setUser(User user) {

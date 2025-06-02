@@ -18,8 +18,14 @@ public class VehicleDTO {
 
     private String brand;
     private String model;
+    private String picture;
     private String plateNumber;
     private Integer seats;
     private Integer year ;
     private String color;
+    private Boolean airCondition;
+    private Boolean usbCharging;
+    private Boolean music;
+    private Boolean comfortableSeats;
+
 }

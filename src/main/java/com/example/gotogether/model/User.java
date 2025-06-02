@@ -3,12 +3,14 @@ package com.example.gotogether.model;
 import com.example.gotogether.enums.Role;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Table(name = "users")
@@ -52,6 +54,11 @@ public class User {
 
     private Integer numberOfRides = 0;
 
+    private Boolean smoking = false;
+    private Boolean pets = false;
+    private Boolean music = false;
+    private Boolean talking = false;
+
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate created;
 
@@ -62,6 +69,10 @@ public class User {
     @OneToMany(mappedBy = "driver", cascade = CascadeType.ALL)
     @JsonIgnore
     private Set<Ride> rides = new HashSet<>();
+
+    @OneToMany(mappedBy = "reviewedUser", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<Review> reviews;
 
 
 

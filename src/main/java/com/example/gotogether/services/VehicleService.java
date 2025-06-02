@@ -43,8 +43,13 @@ public class VehicleService {
         vehicle.setBrand(dto.getBrand());
         vehicle.setPlateNumber(dto.getPlateNumber());
         vehicle.setModel(dto.getModel());
+        vehicle.setPicture(dto.getPicture());
         vehicle.setColor(dto.getColor());
         vehicle.setSeats(dto.getSeats());
+        vehicle.setAirCondition(dto.getAirCondition());
+        vehicle.setUsbCharging(dto.getUsbCharging());
+        vehicle.setMusic(dto.getMusic());
+        vehicle.setComfortableSeats(dto.getComfortableSeats());
         vehicle.setUser(user);
 
         Vehicle saved = vehicleRepository.save(vehicle);
@@ -82,8 +87,13 @@ public class VehicleService {
         vehicle.setPlateNumber(dto.getPlateNumber());
         vehicle.setModel(dto.getModel());
         vehicle.setColor(dto.getColor());
+        vehicle.setPicture(dto.getPicture());
         vehicle.setYear(dto.getYear());
         vehicle.setSeats(dto.getSeats());
+        vehicle.setAirCondition(dto.getAirCondition());
+        vehicle.setUsbCharging(dto.getUsbCharging());
+        vehicle.setMusic(dto.getMusic());
+        vehicle.setComfortableSeats(dto.getComfortableSeats());
         vehicle.setUser(user);
         Vehicle updatedVehicle = vehicleRepository.save(vehicle);
 
@@ -97,7 +107,12 @@ public class VehicleService {
         dto.setModel(vehicle.getModel());
         dto.setPlateNumber(vehicle.getPlateNumber());
         dto.setColor(vehicle.getColor());
+        dto.setPicture(vehicle.getPicture());
         dto.setSeats(vehicle.getSeats());
+        dto.setAirCondition(vehicle.getAirCondition());
+        dto.setUsbCharging(vehicle.getUsbCharging());
+        dto.setMusic(vehicle.getMusic());
+        dto.setComfortableSeats(vehicle.getComfortableSeats());
         dto.setUserId(vehicle.getUser().getId());
         return dto;
     }

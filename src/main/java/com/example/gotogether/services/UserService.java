@@ -63,6 +63,12 @@ public class UserService {
         dto.setEmail(user.getEmail());
         dto.setRole(String.valueOf(user.getRole()));
         dto.setRating(user.getRating());
+        dto.setSmoking(user.getSmoking());
+        dto.setPets(user.getPets());
+        dto.setMusic(user.getMusic());
+        dto.setTalking(user.getTalking());
+        dto.setVehicle(mapToDto(user.getVehicle()));
+
         return dto;
     }
 
@@ -95,6 +101,25 @@ public class UserService {
         return userRepository.findById(id)
                 .map(this::mapToDto)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    private VehicleDTO mapToDto(Vehicle vehicle) {
+        if(vehicle == null) {return null;}
+        return VehicleDTO.builder()
+                .id(vehicle.getId())
+                .userId(vehicle.getUser().getId())
+                .brand(vehicle.getBrand())
+                .model(vehicle.getModel())
+                .picture(vehicle.getPicture())
+                .plateNumber(vehicle.getPlateNumber())
+                .seats(vehicle.getSeats())
+                .year(vehicle.getYear())
+                .color(vehicle.getColor())
+                .airCondition(vehicle.getAirCondition())
+                .usbCharging(vehicle.getUsbCharging())
+                .music(vehicle.getMusic())
+                .comfortableSeats(vehicle.getComfortableSeats())
+                .build();
     }
 
 

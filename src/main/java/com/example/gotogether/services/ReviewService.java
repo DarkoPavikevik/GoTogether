@@ -6,8 +6,11 @@ import com.example.gotogether.model.Review;
 import com.example.gotogether.model.Ride;
 import com.example.gotogether.model.User;
 import com.example.gotogether.repositories.ReviewRepository;
+import com.example.gotogether.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,28 +23,41 @@ public class ReviewService {
     @Autowired
     private final ReviewRepository reviewRepository;
 
+    @Autowired
+    private final UserRepository userRepository;
+
     public List<ReviewDTO> getAllReviews() {
         return reviewRepository.findAll().stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
 
-    public ReviewDTO getReviewById(Long id) {
-        Review review = reviewRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Review not found with id " + id));
-        return mapToDTO(review);
+    public Page<ReviewDTO> getReviewById(Long id, Pageable pageable) {
+        Page<Review> reviews = reviewRepository.findAllByReviewedUserId(id, pageable);
+        return reviews.map(this::mapToDTO);
     }
 
     public ReviewDTO createReview(ReviewDTO dto) {
+
+        User reviewer = userRepository.findById(dto.getReviewerId())
+                .orElseThrow(() -> new ResourceNotFoundException("Reviewer not found"));
+
+        User reviewedUser = userRepository.findById(dto.getReviewedUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("Reviewed user not found"));
+
         Review review = new Review();
         review.setComment(dto.getComment());
         review.setRating(dto.getRating());
-        review.setReviewer(new User(dto.getReviewerId()));
-        review.setReviewedUser(new User(dto.getReviewedUserId()));
-        review.setRide(new Ride(dto.getRideId()));
+        review.setReviewer(reviewer);
+        review.setReviewedUser(reviewedUser);
+        review.setCommentDate(dto.getCommentDate());
 
 
         Review saved = reviewRepository.save(review);
+
+        updateUserRating(reviewedUser.getId());
+
+
         return mapToDTO(saved);
     }
 
@@ -53,7 +69,7 @@ public class ReviewService {
         existing.setRating(dto.getRating());
         existing.setReviewer(new User(dto.getReviewerId()));
         existing.setReviewedUser(new User(dto.getReviewedUserId()));
-        existing.setRide(new Ride(dto.getRideId()));
+        existing.setCommentDate(dto.getCommentDate());
 
         Review updated = reviewRepository.save(existing);
         return mapToDTO(updated);
@@ -66,6 +82,24 @@ public class ReviewService {
         reviewRepository.deleteById(id);
     }
 
+    private void updateUserRating(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        Integer totalRating = reviewRepository.sumRatingsByReviewedUserId(userId);
+        int numberOfReviews = reviewRepository.countByReviewedUserId(userId);
+
+        if (totalRating == null || numberOfReviews == 0) {
+            user.setRating(0.0);
+        } else {
+            double newRating = Math.round(((double) totalRating / numberOfReviews) * 10.0) / 10.0;
+            user.setRating(newRating);
+        }
+
+        userRepository.save(user);
+    }
+
+
     public ReviewDTO mapToDTO(Review review) {
         ReviewDTO dto = new ReviewDTO();
         dto.setId(review.getId());
@@ -73,7 +107,7 @@ public class ReviewService {
         dto.setRating(review.getRating());
         dto.setReviewerId(review.getReviewer().getId());
         dto.setReviewedUserId(review.getReviewedUser().getId());
-        dto.setRideId(review.getRide().getId());
+        dto.setCommentDate(review.getCommentDate());
         return dto;
     }
 }

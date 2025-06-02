@@ -25,4 +25,10 @@ public class UserDTO {
     private String phoneNumber;
     private String profilePicture;
     private String password;
+    private Boolean smoking;
+    private Boolean pets;
+    private Boolean music;
+    private Boolean talking;
+    private VehicleDTO vehicle;
+    private ReviewDTO review;
 }
