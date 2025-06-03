@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -23,6 +24,7 @@ public class UserDTO {
     private Double rating;
     private String username;
     private String phoneNumber;
+    private Integer numberOfRides;
     private String profilePicture;
     private String password;
     private Boolean smoking;
@@ -30,5 +32,5 @@ public class UserDTO {
     private Boolean music;
     private Boolean talking;
     private VehicleDTO vehicle;
-    private ReviewDTO review;
+    private List<ReviewDTO> reviews;
 }

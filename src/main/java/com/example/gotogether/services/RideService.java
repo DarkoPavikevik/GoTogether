@@ -98,9 +98,12 @@ public class RideService {
                     .map(review -> ReviewDTO.builder()
                             .id(review.getId())
                             .reviewerId(review.getId()) // assuming this field exists
+                            .reviewedUserId(review.getReviewedUser().getId())
                             .commentDate(review.getCommentDate())
                             .comment(review.getComment())
                             .rating(review.getRating())
+                            .reviewerName(review.getReviewer().getUsername())
+                            .reviewerPicture(review.getReviewer().getProfilePicture())
                             .build())
                     .collect(Collectors.toList());
 
@@ -128,6 +131,10 @@ public class RideService {
                     .color(vehicle.getColor())
                     .plateNumber(vehicle.getPlateNumber())
                     .seats(vehicle.getSeats())
+                    .airCondition(vehicle.getAirCondition())
+                    .usbCharging(vehicle.getUsbCharging())
+                    .music(vehicle.getMusic())
+                    .comfortableSeats(vehicle.getComfortableSeats())
                     .build();
         }
 
@@ -150,7 +157,7 @@ public class RideService {
         return RideDTO.builder()
                 .id(ride.getId())
                 .userInfo(userInfoDTO)
-                .vehicleDTO(vehicleDTO)
+                .vehicle(vehicleDTO)
                 .estimate(estimate)
                 .fromLocation(ride.getFromLocation())
                 .toLocation(ride.getToLocation())

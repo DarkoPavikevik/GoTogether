@@ -16,8 +16,10 @@ public class ReviewDTO {
     private String comment;
     private int rating;
     private Long reviewerId;
+    private String reviewerName;
     private Long reviewedUserId;
     private LocalDate commentDate;
+    private String reviewerPicture;
 
 }
 

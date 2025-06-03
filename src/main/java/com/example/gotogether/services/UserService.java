@@ -1,9 +1,11 @@
 package com.example.gotogether.services;
 
+import com.example.gotogether.dto.ReviewDTO;
 import com.example.gotogether.dto.UserDTO;
 import com.example.gotogether.dto.VehicleDTO;
 import com.example.gotogether.enums.Role;
 import com.example.gotogether.exceptions.ResourceNotFoundException;
+import com.example.gotogether.model.Review;
 import com.example.gotogether.model.User;
 import com.example.gotogether.model.Vehicle;
 import com.example.gotogether.repositories.UserRepository;
@@ -36,7 +38,7 @@ public class UserService {
             user.setProfilePicture(userDTO.getProfilePicture());
         }
         if (userDTO.getName() != null) {
-            user.setName(userDTO.getName());
+            user.setName(userDTO.getUsername());
         }
         if (userDTO.getEmail() != null) {
             user.setEmail(userDTO.getEmail());
@@ -66,24 +68,30 @@ public class UserService {
         dto.setSmoking(user.getSmoking());
         dto.setPets(user.getPets());
         dto.setMusic(user.getMusic());
+        dto.setNumberOfRides(user.getNumberOfRides());
         dto.setTalking(user.getTalking());
         dto.setVehicle(mapToDto(user.getVehicle()));
+        dto.setReviews(
+                user.getReviews()
+                        .stream()
+                        .map(this::mapToReviewDto)
+                        .collect(Collectors.toList())
+        );
 
         return dto;
     }
 
 
-    public UserDTO editProfile(Long id, UserDTO dto) {
+    public UserDTO editPreferences(Long id, UserDTO dto) {
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
 
-        user.setUsername(dto.getUsername());
-        user.setEmail(dto.getEmail());
-        user.setBio(dto.getBio());
-        user.setPhoneNumber(dto.getPhoneNumber());
-        user.setProfilePicture(dto.getProfilePicture());
+        user.setSmoking(dto.getSmoking());
+        user.setPets(dto.getPets());
+        user.setTalking(dto.getTalking());
+        user.setMusic(dto.getMusic());
         User updatedVehicle = userRepository.save(user);
 
         return mapToDto(updatedVehicle);
@@ -119,6 +127,25 @@ public class UserService {
                 .usbCharging(vehicle.getUsbCharging())
                 .music(vehicle.getMusic())
                 .comfortableSeats(vehicle.getComfortableSeats())
+                .build();
+    }
+
+    private ReviewDTO mapToReviewDto(Review review) {
+        if(review == null)
+        {
+            return null;
+        }
+        return ReviewDTO.builder()
+                .id(review.getId())
+                .reviewerPicture(review.getReviewer().getProfilePicture())
+                .reviewerName(review.getReviewer().getUsername())
+                .reviewerId(review.getReviewer().getId())
+                .rating(review.getRating())
+                .comment(review.getComment())
+                .commentDate(review.getCommentDate())
+                .comment(review.getComment())
+                .reviewedUserId(review.getReviewedUser().getId())
+                .reviewerPicture(review.getReviewer().getProfilePicture())
                 .build();
     }
 

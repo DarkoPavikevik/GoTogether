@@ -33,6 +33,13 @@ public class UserController {
         return ResponseEntity.ok(editerUser);
     }
 
+    @PutMapping("preferences/{id}")
+    public ResponseEntity<UserDTO> editUserPreferences(@PathVariable Long id, @RequestBody UserDTO userDTO) {
+        UserDTO editUserPreference = userService.editPreferences(id,userDTO);
+        return ResponseEntity.ok(editUserPreference);
+    }
+
+
 
 
 

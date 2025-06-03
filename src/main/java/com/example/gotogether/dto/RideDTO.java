@@ -21,7 +21,7 @@ public class RideDTO {
 
     private Long id;
     private UserInfoDTO userInfo;
-    private VehicleDTO vehicleDTO;
+    private VehicleDTO vehicle;
     private RideEstimateResponseDTO estimate;
     private String fromLocation;
     private String toLocation;

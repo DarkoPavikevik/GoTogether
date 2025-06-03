@@ -108,6 +108,8 @@ public class ReviewService {
         dto.setReviewerId(review.getReviewer().getId());
         dto.setReviewedUserId(review.getReviewedUser().getId());
         dto.setCommentDate(review.getCommentDate());
+        dto.setReviewerName(review.getReviewer().getUsername());
+        dto.setReviewerPicture(review.getReviewer().getProfilePicture());
         return dto;
     }
 }
