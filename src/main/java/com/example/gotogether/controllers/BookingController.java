@@ -1,12 +1,14 @@
 package com.example.gotogether.controllers;
 
 import com.example.gotogether.dto.BookingDTO;
+import com.example.gotogether.dto.BookingReuquestDTO;
 import com.example.gotogether.model.Booking;
 import com.example.gotogether.services.BookingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -42,5 +44,11 @@ public class BookingController {
     public ResponseEntity<Void> deleteBooking(@PathVariable Long id) {
         bookingService.deleteBooking(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/request")
+    public ResponseEntity<?> requestToJoinRide(@RequestBody BookingReuquestDTO bookingRequestDto, Principal principal) {
+        bookingService.requestToJoinRide(bookingRequestDto, principal.getName());
+        return ResponseEntity.ok("Booking request sent");
     }
 }

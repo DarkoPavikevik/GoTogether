@@ -1,11 +1,14 @@
 package com.example.gotogether.services;
 
 import com.example.gotogether.dto.BookingDTO;
+import com.example.gotogether.dto.BookingReuquestDTO;
 import com.example.gotogether.exceptions.ResourceNotFoundException;
 import com.example.gotogether.model.Booking;
 import com.example.gotogether.model.Ride;
 import com.example.gotogether.model.User;
 import com.example.gotogether.repositories.BookingRepository;
+import com.example.gotogether.repositories.RideRepository;
+import com.example.gotogether.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,15 @@ public class BookingService {
 
     @Autowired
     private final BookingRepository bookingRepository;
+
+    @Autowired
+    private final EmailService emailService;
+
+    @Autowired
+    private final UserRepository userRepository;
+
+    @Autowired
+    private final RideRepository rideRepository;
 
     public List<BookingDTO> getAllBookings() {
         return bookingRepository.findAll().stream()
@@ -61,6 +73,27 @@ public class BookingService {
             throw new ResourceNotFoundException("Booking not found with id " + id);
         }
         bookingRepository.deleteById(id);
+    }
+
+    public void requestToJoinRide(BookingReuquestDTO dto, String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Ride ride = rideRepository.findById(dto.getRideId())
+                .orElseThrow(() -> new RuntimeException("Ride not found"));
+
+        Booking booking = Booking.builder()
+                .ride(ride)
+                .user(user)
+                .numberOfSeats(dto.getNumberOfSeats())
+                .status("PENDING")
+                .emailSent(true)
+                .build();
+
+        bookingRepository.save(booking);
+
+        // Send email to ride owner
+        emailService.sendBookingRequestEmail(ride.getDriver(), user, ride);
     }
 
     public BookingDTO mapToDTO(Booking booking) {
