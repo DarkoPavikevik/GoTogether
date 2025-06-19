@@ -1,6 +1,7 @@
 package com.example.gotogether.model;
 
 
+import com.example.gotogether.enums.BookingStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,7 +28,7 @@ public class Booking {
 
     private int numberOfSeats;
 
-    private String status; // e.g., "PENDING", "CONFIRMED", "REJECTED"
+    private BookingStatus status; // e.g., "PENDING", "CONFIRMED", "REJECTED"
 
     private boolean emailSent;
 

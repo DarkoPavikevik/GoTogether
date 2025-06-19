@@ -10,13 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BookingDTO {
-
-    private Long id;
-    private Long userId;
-    private Long rideId;
+public class PassengerBookingDTO {
+    private UserInfoDTO user;
     private int numberOfSeats;
-    private BookingStatus status; // e.g., "PENDING", "CONFIRMED", "REJECTED"
-    private boolean emailSent;
+    private BookingStatus status;
 }
-

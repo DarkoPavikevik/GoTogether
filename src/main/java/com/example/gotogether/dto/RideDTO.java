@@ -34,5 +34,6 @@ public class RideDTO {
     private Currency currency;
     private List<String> waypoints;
     private String notes;
+    private List<PassengerBookingDTO> passengerBookings;
 
 }

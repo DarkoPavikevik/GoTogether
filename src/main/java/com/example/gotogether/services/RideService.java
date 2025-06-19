@@ -38,6 +38,9 @@ public class RideService {
     @Autowired
     private final RouteService routeService;
 
+    @Autowired
+    private final BookingService bookingService;
+
     public List<RideDTO> getAllRides() {
         return rideRepository.findAll().stream()
                 .map(this::mapToDTO)
@@ -89,6 +92,8 @@ public class RideService {
     private RideDTO mapToDTO(Ride ride) {
         UserInfoDTO userInfoDTO = null;
         VehicleDTO vehicleDTO = null;
+        List<PassengerBookingDTO> confirmedPassengers = bookingService.getConfirmedPassengersForRide(ride.getId());
+
 
         if (ride.getDriver() != null) {
             User driver = ride.getDriver();
@@ -170,6 +175,7 @@ public class RideService {
                 .currency(ride.getCurrency())
                 .waypoints(ride.getWaypoints())
                 .notes(ride.getNotes())
+                .passengerBookings(confirmedPassengers)
                 .build();
     }
 

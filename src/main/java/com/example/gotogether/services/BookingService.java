@@ -2,6 +2,9 @@ package com.example.gotogether.services;
 
 import com.example.gotogether.dto.BookingDTO;
 import com.example.gotogether.dto.BookingReuquestDTO;
+import com.example.gotogether.dto.PassengerBookingDTO;
+import com.example.gotogether.dto.UserInfoDTO;
+import com.example.gotogether.enums.BookingStatus;
 import com.example.gotogether.exceptions.ResourceNotFoundException;
 import com.example.gotogether.model.Booking;
 import com.example.gotogether.model.Ride;
@@ -44,12 +47,22 @@ public class BookingService {
         return mapToDTO(booking);
     }
 
+    public List<PassengerBookingDTO> getConfirmedPassengersForRide(Long rideId) {
+        Ride ride = rideRepository.findById(rideId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ride not found with id " + rideId));
+
+        return bookingRepository.findByRide(ride).stream()
+                .filter(booking -> booking.getStatus() == BookingStatus.CONFIRMED)
+                .map(this::mapToPassengerDTO)
+                .collect(Collectors.toList());
+    }
+
     public BookingDTO createBooking(BookingDTO bookingDTO) {
         Booking booking = new Booking();
         booking.setUser(new User(bookingDTO.getUserId()));
         booking.setRide(new Ride(bookingDTO.getRideId()));
         booking.setNumberOfSeats(bookingDTO.getNumberOfSeats());
-        booking.setStatus("PENDING"); // default status
+        booking.setStatus(BookingStatus.PENDING); // default status
         booking.setEmailSent(false); // email status initially false
 
         Booking saved = bookingRepository.save(booking);
@@ -86,7 +99,7 @@ public class BookingService {
                 .ride(ride)
                 .user(user)
                 .numberOfSeats(dto.getNumberOfSeats())
-                .status("PENDING")
+                .status(BookingStatus.PENDING)
                 .emailSent(true)
                 .build();
 
@@ -105,5 +118,16 @@ public class BookingService {
         dto.setStatus(booking.getStatus());
         dto.setEmailSent(booking.isEmailSent());
         return dto;
+    }
+    public PassengerBookingDTO mapToPassengerDTO(Booking booking) {
+        return PassengerBookingDTO.builder()
+                .user(UserInfoDTO.builder()
+                        .id(booking.getUser().getId())
+                        .name(booking.getUser().getUsername())
+                        // Add any other fields if needed
+                        .build())
+                .numberOfSeats(booking.getNumberOfSeats())
+                .status(booking.getStatus())
+                .build();
     }
 }
