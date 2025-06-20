@@ -26,6 +26,9 @@ public class ReviewService {
     @Autowired
     private final UserRepository userRepository;
 
+    @Autowired
+    private final EmailService emailService;
+
     public List<ReviewDTO> getAllReviews() {
         return reviewRepository.findAll().stream()
                 .map(this::mapToDTO)
@@ -94,6 +97,9 @@ public class ReviewService {
         } else {
             double newRating = Math.round(((double) totalRating / numberOfReviews) * 10.0) / 10.0;
             user.setRating(newRating);
+        }
+        if (totalRating < 1.5) {
+            emailService.sendLowRatingAlert(user);
         }
 
         userRepository.save(user);

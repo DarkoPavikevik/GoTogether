@@ -2,6 +2,7 @@ package com.example.gotogether.controllers;
 
 import com.example.gotogether.dto.PopularRouteDTO;
 import com.example.gotogether.dto.RideDTO;
+import com.example.gotogether.model.Ride;
 import com.example.gotogether.services.RideService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -72,6 +73,12 @@ public class RideController {
         Pageable pageable = PageRequest.of(page, size, sort);
 
         return rideService.searchRides(from, to, date, pageable);
+    }
+
+    @GetMapping("/user/{driverId}")
+    public ResponseEntity<List<Ride>> getRidesByDriver(@PathVariable Long driverId)
+    {
+        return ResponseEntity.ok(rideService.getRidesByDriver(driverId));
     }
 
 

@@ -1,6 +1,7 @@
 package com.example.gotogether.repositories;
 
 import com.example.gotogether.dto.PopularRouteDTO;
+import com.example.gotogether.dto.RideDTO;
 import com.example.gotogether.model.Ride;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

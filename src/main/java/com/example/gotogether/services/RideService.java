@@ -89,6 +89,11 @@ public class RideService {
         rideRepository.deleteById(id);
     }
 
+    public List<Ride> getRidesByDriver(Long driverId)
+    {
+        return rideRepository.findByDriverId(driverId);
+    }
+
     private RideDTO mapToDTO(Ride ride) {
         UserInfoDTO userInfoDTO = null;
         VehicleDTO vehicleDTO = null;
