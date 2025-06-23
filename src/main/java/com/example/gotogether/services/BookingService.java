@@ -112,7 +112,9 @@ public class BookingService {
     public BookingDTO mapToDTO(Booking booking) {
         BookingDTO dto = new BookingDTO();
         dto.setId(booking.getId());
-        dto.setUserId(booking.getUser().getId()); // Getting the user ID
+        dto.setUserId(booking.getUser().getId());
+        dto.setPhoneNumber(booking.getUser().getPhoneNumber());
+        dto.setUsername(booking.getUser().getUsername());// Getting the user ID
         dto.setRideId(booking.getRide().getId()); // Getting the ride ID
         dto.setNumberOfSeats(booking.getNumberOfSeats());
         dto.setStatus(booking.getStatus());

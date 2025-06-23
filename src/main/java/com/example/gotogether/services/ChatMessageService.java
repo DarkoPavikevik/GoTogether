@@ -5,6 +5,7 @@ import com.example.gotogether.exceptions.ResourceNotFoundException;
 import com.example.gotogether.model.ChatMessage;
 import com.example.gotogether.model.User;
 import com.example.gotogether.repositories.ChatMessageRepository;
+import com.example.gotogether.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,49 +18,42 @@ import java.util.stream.Collectors;
 public class ChatMessageService {
 
     private final ChatMessageRepository chatMessageRepository;
-    private final UserService userService; // Add this dependency
+    private final UserRepository userRepository;
 
-    public List<ChatMessageDTO> getAllMessages() {
-        return chatMessageRepository.findAll().stream()
-                .map(this::mapToDTO)
-                .collect(Collectors.toList());
-    }
+    public ChatMessageDTO sendMessage(ChatMessageDTO dto) {
+        User sender = userRepository.findById(dto.getSenderId())
+                .orElseThrow(() -> new RuntimeException("Sender not found"));
+        User receiver = userRepository.findById(dto.getReceiverId())
+                .orElseThrow(() -> new RuntimeException("Receiver not found"));
 
-    public ChatMessageDTO getMessageById(Long id) {
-        ChatMessage chat = chatMessageRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Message not found with id " + id));
-        return mapToDTO(chat);
-    }
-
-    public ChatMessageDTO createMessage(ChatMessageDTO dto) {
-        // Fetch actual user entities
-        User sender = userService.findById(dto.getSenderId())
-                .orElseThrow(() -> new ResourceNotFoundException("Sender not found"));
-        User receiver = userService.findById(dto.getReceiverId())
-                .orElseThrow(() -> new ResourceNotFoundException("Receiver not found"));
-
-        ChatMessage msg = ChatMessage.builder()
+        ChatMessage message = ChatMessage.builder()
                 .sender(sender)
                 .receiver(receiver)
                 .message(dto.getMessage())
-                .timestamp(dto.getTimestamp() != null ? dto.getTimestamp() : LocalDateTime.now())
+                .timestamp(LocalDateTime.now())
                 .build();
 
-        ChatMessage saved = chatMessageRepository.save(msg);
-        return mapToDTO(saved);
+        chatMessageRepository.save(message);
+
+        dto.setId(message.getId());
+        dto.setTimestamp(message.getTimestamp());
+
+        return dto;
     }
 
-    public void deleteMessage(Long id) {
-        chatMessageRepository.deleteById(id);
-    }
+    public List<ChatMessageDTO> getConversation(Long user1Id, Long user2Id) {
+        List<ChatMessage> messages = chatMessageRepository
+                .findBySenderIdAndReceiverIdOrReceiverIdAndSenderIdOrderByTimestampAsc(
+                        user1Id, user2Id, user1Id, user2Id
+                );
 
-    public ChatMessageDTO mapToDTO(ChatMessage chat) {
-        return ChatMessageDTO.builder()
-                .id(chat.getId())
-                .senderId(chat.getSender().getId())
-                .receiverId(chat.getReceiver().getId())
-                .message(chat.getMessage())
-                .timestamp(chat.getTimestamp())
-                .build();
+        return messages.stream().map(msg -> ChatMessageDTO.builder()
+                .id(msg.getId())
+                .senderId(msg.getSender().getId())
+                .receiverId(msg.getReceiver().getId())
+                .message(msg.getMessage())
+                .timestamp(msg.getTimestamp())
+                .build()).toList();
     }
 }
+

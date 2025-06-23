@@ -14,6 +14,8 @@ public class BookingDTO {
 
     private Long id;
     private Long userId;
+    private String username;
+    private String phoneNumber;
     private Long rideId;
     private int numberOfSeats;
     private BookingStatus status; // e.g., "PENDING", "CONFIRMED", "REJECTED"

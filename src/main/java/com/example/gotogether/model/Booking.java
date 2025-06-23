@@ -26,6 +26,7 @@ public class Booking {
     @JsonIgnore
     private Ride ride;
 
+
     private int numberOfSeats;
 
     private BookingStatus status; // e.g., "PENDING", "CONFIRMED", "REJECTED"

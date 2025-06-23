@@ -20,7 +20,7 @@ public class BookingController {
     private final BookingService bookingService;
 
 
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<List<BookingDTO>> getAllBookings() {
         return ResponseEntity.ok(bookingService.getAllBookings());
     }
