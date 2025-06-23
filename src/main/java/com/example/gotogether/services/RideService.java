@@ -19,6 +19,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -93,6 +95,27 @@ public class RideService {
     {
         return rideRepository.findByDriverId(driverId);
     }
+
+    public List<RideDTO> getPastRidesForUser(Long userId) {
+        LocalDate today = LocalDate.now();
+        LocalTime nowTime = LocalTime.now();
+
+        List<Ride> pastRides = rideRepository.findPastRidesByUser(userId, today, nowTime);
+        return pastRides.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<RideDTO> getFutureRidesForUser(Long userId) {
+        LocalDate today = LocalDate.now();
+        LocalTime nowTime = LocalTime.now();
+
+        List<Ride> futureRides = rideRepository.findFutureRidesByUser(userId, today, nowTime);
+        return futureRides.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
 
     private RideDTO mapToDTO(Ride ride) {
         UserInfoDTO userInfoDTO = null;

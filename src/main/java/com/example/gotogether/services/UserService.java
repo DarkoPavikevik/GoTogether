@@ -46,6 +46,9 @@ public class UserService {
         if (userDTO.getBio() != null) {
             user.setBio(userDTO.getBio());
         }
+        if (userDTO.getPhoneNumber() != null) {
+            user.setPhoneNumber(userDTO.getPhoneNumber());
+        }
 
         User savedUser = userRepository.save(user);
 

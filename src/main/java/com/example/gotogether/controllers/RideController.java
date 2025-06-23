@@ -89,6 +89,16 @@ public class RideController {
         return ResponseEntity.ok(rideService.getTopPopularRoutes(limit));
     }
 
+    @GetMapping("/past/{userId}")
+    public ResponseEntity<List<RideDTO>> getPastRidesForUser(@PathVariable Long userId) {
+        return ResponseEntity.ok(rideService.getPastRidesForUser(userId));
+    }
+
+    @GetMapping("/future/{userId}")
+    public ResponseEntity<List<RideDTO>> getFutureRidesForUser(@PathVariable Long userId) {
+        return ResponseEntity.ok(rideService.getFutureRidesForUser(userId));
+    }
+
 
 
 }
