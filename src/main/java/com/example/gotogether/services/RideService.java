@@ -8,6 +8,7 @@ import com.example.gotogether.model.Review;
 import com.example.gotogether.model.Ride;
 import com.example.gotogether.model.User;
 import com.example.gotogether.model.Vehicle;
+import com.example.gotogether.repositories.BookingRepository;
 import com.example.gotogether.repositories.RideRepository;
 import com.example.gotogether.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,9 @@ public class RideService {
 
     @Autowired
     private final BookingService bookingService;
+
+    @Autowired
+    private final BookingRepository bookingRepository;
 
     public List<RideDTO> getAllRides() {
         return rideRepository.findAll().stream()
@@ -96,24 +100,32 @@ public class RideService {
         return rideRepository.findByDriverId(driverId);
     }
 
-    public List<RideDTO> getPastRidesForUser(Long userId) {
+    public List<UserRideDTO> getPastRidesForUser(Long userId) {
         LocalDate today = LocalDate.now();
         LocalTime nowTime = LocalTime.now();
 
-        List<Ride> pastRides = rideRepository.findPastRidesByUser(userId, today, nowTime);
-        return pastRides.stream()
-                .map(this::mapToDTO)
-                .collect(Collectors.toList());
+        List<Ride> driverRides = rideRepository.findPastRidesByUser(userId, today, nowTime);
+        List<Ride> bookedRides = bookingRepository.findPastBookedRides(userId, today, nowTime);
+
+        List<UserRideDTO> combined = new ArrayList<>();
+        driverRides.forEach(ride -> combined.add(new UserRideDTO(mapToDTO(ride), true)));
+        bookedRides.forEach(ride -> combined.add(new UserRideDTO(mapToDTO(ride), false)));
+
+        return combined;
     }
 
-    public List<RideDTO> getFutureRidesForUser(Long userId) {
+    public List<UserRideDTO> getFutureRidesForUser(Long userId) {
         LocalDate today = LocalDate.now();
         LocalTime nowTime = LocalTime.now();
 
-        List<Ride> futureRides = rideRepository.findFutureRidesByUser(userId, today, nowTime);
-        return futureRides.stream()
-                .map(this::mapToDTO)
-                .collect(Collectors.toList());
+        List<Ride> driverRides = rideRepository.findFutureRidesByUser(userId, today, nowTime);
+        List<Ride> bookedRides = bookingRepository.findFutureBookedRides(userId, today, nowTime);
+
+        List<UserRideDTO> combined = new ArrayList<>();
+        driverRides.forEach(ride -> combined.add(new UserRideDTO(mapToDTO(ride), true)));
+        bookedRides.forEach(ride -> combined.add(new UserRideDTO(mapToDTO(ride), false)));
+
+        return combined;
     }
 
 

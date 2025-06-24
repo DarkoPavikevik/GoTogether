@@ -2,6 +2,7 @@ package com.example.gotogether.controllers;
 
 import com.example.gotogether.dto.PopularRouteDTO;
 import com.example.gotogether.dto.RideDTO;
+import com.example.gotogether.dto.UserRideDTO;
 import com.example.gotogether.model.Ride;
 import com.example.gotogether.services.RideService;
 import lombok.RequiredArgsConstructor;
@@ -90,12 +91,12 @@ public class RideController {
     }
 
     @GetMapping("/past/{userId}")
-    public ResponseEntity<List<RideDTO>> getPastRidesForUser(@PathVariable Long userId) {
+    public ResponseEntity<List<UserRideDTO>> getPastRidesForUser(@PathVariable Long userId) {
         return ResponseEntity.ok(rideService.getPastRidesForUser(userId));
     }
 
     @GetMapping("/future/{userId}")
-    public ResponseEntity<List<RideDTO>> getFutureRidesForUser(@PathVariable Long userId) {
+    public ResponseEntity<List<UserRideDTO>> getFutureRidesForUser(@PathVariable Long userId) {
         return ResponseEntity.ok(rideService.getFutureRidesForUser(userId));
     }
 
