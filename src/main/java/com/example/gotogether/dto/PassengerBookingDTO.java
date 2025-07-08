@@ -12,6 +12,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class PassengerBookingDTO {
     private UserInfoDTO user;
-    private int numberOfSeats;
     private BookingStatus status;
 }

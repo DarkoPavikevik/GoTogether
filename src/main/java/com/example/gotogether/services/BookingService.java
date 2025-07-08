@@ -15,8 +15,11 @@ import com.example.gotogether.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,6 +38,34 @@ public class BookingService {
     @Autowired
     private final RideRepository rideRepository;
 
+
+
+
+    private final String GEOCODE_URL = "https://api.openrouteservice.org/geocode/search";
+    private final String API_KEY = "5b3ce3597851110001cf62488d8bf5fbf5134087a250246d98fe102c";
+    private final RestTemplate restTemplate = new RestTemplate();
+    private final Map<String, List<Double>> cachedCoordinates = new HashMap<>();
+
+    private List<Double> getCoordinates(String location) {
+        if (cachedCoordinates.containsKey(location)) {
+            return cachedCoordinates.get(location);
+        }
+
+        String url = GEOCODE_URL + "?api_key=" + API_KEY + "&text=" + location + "&boundary.country=MK";
+
+        var response = restTemplate.getForEntity(url, String.class);
+        var json = new org.json.JSONObject(response.getBody());
+        var features = json.getJSONArray("features");
+
+        if (features.length() == 0) {
+            throw new RuntimeException("No coordinates found for: " + location);
+        }
+
+        var coords = features.getJSONObject(0).getJSONObject("geometry").getJSONArray("coordinates");
+        List<Double> coordList = List.of(coords.getDouble(0), coords.getDouble(1));
+        cachedCoordinates.put(location, coordList);
+        return coordList;
+    }
     public List<BookingDTO> getAllBookings() {
         return bookingRepository.findAll().stream()
                 .map(this::mapToDTO)
@@ -61,7 +92,6 @@ public class BookingService {
         Booking booking = new Booking();
         booking.setUser(new User(bookingDTO.getUserId()));
         booking.setRide(new Ride(bookingDTO.getRideId()));
-        booking.setNumberOfSeats(bookingDTO.getNumberOfSeats());
         booking.setStatus(BookingStatus.PENDING); // default status
         booking.setEmailSent(false); // email status initially false
 
@@ -74,7 +104,6 @@ public class BookingService {
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found with id " + id));
 
         existingBooking.setStatus(bookingDTO.getStatus());
-        existingBooking.setNumberOfSeats(bookingDTO.getNumberOfSeats());
         existingBooking.setEmailSent(bookingDTO.isEmailSent());
 
         Booking updated = bookingRepository.save(existingBooking);
@@ -95,17 +124,24 @@ public class BookingService {
         Ride ride = rideRepository.findById(dto.getRideId())
                 .orElseThrow(() -> new RuntimeException("Ride not found"));
 
+        List<Double> pickupCoords = getCoordinates(dto.getPickupLocation());
+        List<Double> dropoffCoords = getCoordinates(dto.getDropoffLocation());
+
         Booking booking = Booking.builder()
                 .ride(ride)
                 .user(user)
-                .numberOfSeats(dto.getNumberOfSeats())
+                .pickupLocation(dto.getPickupLocation())
+                .dropoffLocation(dto.getDropoffLocation())
+                .pickupLat(pickupCoords.get(1))
+                .pickupLng(pickupCoords.get(0))
+                .dropoffLat(dropoffCoords.get(1))
+                .dropoffLng(dropoffCoords.get(0))
                 .status(BookingStatus.PENDING)
                 .emailSent(true)
                 .build();
 
         bookingRepository.save(booking);
 
-        // Send email to ride owner
         emailService.sendBookingRequestEmail(ride.getDriver(), user, ride);
     }
 
@@ -116,7 +152,6 @@ public class BookingService {
         dto.setPhoneNumber(booking.getUser().getPhoneNumber());
         dto.setUsername(booking.getUser().getUsername());// Getting the user ID
         dto.setRideId(booking.getRide().getId()); // Getting the ride ID
-        dto.setNumberOfSeats(booking.getNumberOfSeats());
         dto.setStatus(booking.getStatus());
         dto.setEmailSent(booking.isEmailSent());
         return dto;
@@ -128,8 +163,26 @@ public class BookingService {
                         .name(booking.getUser().getUsername())
                         // Add any other fields if needed
                         .build())
-                .numberOfSeats(booking.getNumberOfSeats())
                 .status(booking.getStatus())
                 .build();
     }
+
+    public List<List<Double>> optimizeRideRoute(Long rideId) {
+        Ride ride = rideRepository.findById(rideId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ride not found"));
+
+        List<Booking> bookings = bookingRepository.findByRide(ride);
+
+        List<List<Double>> coordinates = bookings.stream()
+                .flatMap(b -> List.of(
+                        List.of(b.getPickupLng(), b.getPickupLat()),
+                        List.of(b.getDropoffLng(), b.getDropoffLat())
+                ).stream())
+                .collect(Collectors.toList());
+
+        // You can now call ORS directions/optimization APIs with `coordinates`
+        // For now, just return them
+        return coordinates;
+    }
+
 }

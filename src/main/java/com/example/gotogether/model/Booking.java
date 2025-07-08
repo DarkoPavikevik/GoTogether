@@ -26,8 +26,17 @@ public class Booking {
     @JsonIgnore
     private Ride ride;
 
+    @Column(nullable = false)
+    private String pickupLocation;
 
-    private int numberOfSeats;
+    @Column(nullable = false)
+    private String dropoffLocation;
+
+    private Double pickupLat;
+    private Double pickupLng;
+
+    private Double dropoffLat;
+    private Double dropoffLng;
 
     private BookingStatus status; // e.g., "PENDING", "CONFIRMED", "REJECTED"
 

@@ -22,38 +22,44 @@ public class RouteService {
 
 
 
-    private final String API_KEY = "5b3ce3597851110001cf62481fda0866b0f84c70bee6eb5d56f36ae7";
+    private final String API_KEY = "5b3ce3597851110001cf62488d8bf5fbf5134087a250246d98fe102c";
     private final String URL = "https://api.openrouteservice.org/v2/directions/driving-car";
 
+
+    private final Map<String, List<Double>> cachedCoordinates = new HashMap<>();
 
     private List<List<Double>> getCoordinatesForCities(List<String> cities) {
         String geocodeUrl = "https://api.openrouteservice.org/geocode/search";
         RestTemplate restTemplate = new RestTemplate();
-
         List<List<Double>> coordinates = new ArrayList<>();
 
         for (String city : cities) {
-            String url = geocodeUrl + "?api_key=" + API_KEY + "&text=" + city + "&boundary.country=MK";
+            if (cachedCoordinates.containsKey(city)) {
+                coordinates.add(cachedCoordinates.get(city));
+                continue;
+            }
 
+            String url = geocodeUrl + "?api_key=" + API_KEY + "&text=" + city + "&boundary.country=MK";
             ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
             JSONObject json = new JSONObject(response.getBody());
             JSONArray features = json.getJSONArray("features");
 
             if (features.length() == 0) {
                 throw new RuntimeException("Could not find coordinates for city: " + city);
-
             }
 
             JSONArray coordArray = features.getJSONObject(0)
                     .getJSONObject("geometry")
                     .getJSONArray("coordinates");
 
-            List<Double> coord = Arrays.asList(coordArray.getDouble(0), coordArray.getDouble(1)); // [lon, lat]
+            List<Double> coord = Arrays.asList(coordArray.getDouble(0), coordArray.getDouble(1));
+            cachedCoordinates.put(city, coord);
             coordinates.add(coord);
         }
 
         return coordinates;
     }
+
 
     public List<String> getEstimatedArrivalTimes(List<String> cities, LocalTime startTime) {
         List<List<Double>> coordinates = getCoordinatesForCities(cities);

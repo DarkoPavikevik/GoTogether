@@ -10,5 +10,7 @@ import lombok.*;
 @Builder
 public class BookingReuquestDTO {
     private Long rideId;
-    private int numberOfSeats;
+    private String pickupLocation;
+    private String dropoffLocation;
+    private String note;
 }
