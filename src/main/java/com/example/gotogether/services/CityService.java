@@ -23,6 +23,20 @@ public class CityService {
 
 
     public List<String> getCitiesForCountry(String country) {
+        if (country.equalsIgnoreCase("macedonia")) {
+            return List.of(
+                    "Skopje", "Bitola", "Kumanovo", "Prilep", "Tetovo", "Veles", "Ohrid", "Štip", "Gostivar", "Strumica",
+                    "Kočani", "Kavadarci", "Radoviš", "Negotino", "Struga", "Gevgelija", "Debar", "Kriva Palanka", "Berovo",
+                    "Vinica", "Kičevo", "Resen", "Delčevo", "Bogdanci", "Demir Kapija", "Demir Hisar", "Makedonska Kamenica",
+                    "Krusevo", "Kratovo", "Valandovo", "Probistip", "Sveti Nikole", "Pehčevo", "Makedonski Brod", "Drugovo",
+                    "Zelenikovo", "Bosilovo", "Konče", "Rankovce", "Rostuša", "Tearce", "Jegunovce", "Brvenica", "Lozovo",
+                    "Novo Selo", "Staro Nagoričane", "Vasilevo", "Vrapčište", "Zrnovci", "Lipkovo", "Čaška", "Čučer-Sandevo",
+                    "Plasnica", "Dolneni", "Studeničani", "Aracinovo", "Bogovinje", "Vevčani", "Centar Župa"
+            );
+        }
+        return List.of();
+    }
+    /*public List<String> getCitiesForCountry(String country) {
         String url = "https://countriesnow.space/api/v0.1/countries/cities/q?country=" + country;
 
         // No request body needed, it's a GET request now
@@ -31,7 +45,7 @@ public class CityService {
         System.out.println("Body: " + response.getBody());
 
         return response.getBody() != null ? response.getBody().getData() : List.of();
-    }
+    }*/
 
 
 
