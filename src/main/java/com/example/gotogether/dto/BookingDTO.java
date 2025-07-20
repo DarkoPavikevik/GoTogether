@@ -1,6 +1,7 @@
 package com.example.gotogether.dto;
 
 import com.example.gotogether.enums.BookingStatus;
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +19,8 @@ public class BookingDTO {
     private String phoneNumber;
     private Long rideId;
     private BookingStatus status; // e.g., "PENDING", "CONFIRMED", "REJECTED"
+    private String pickupLocation;
+    private String dropoffLocation;
     private boolean emailSent;
 }
 

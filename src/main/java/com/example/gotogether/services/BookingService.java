@@ -101,6 +101,12 @@ public class BookingService {
         booking.setRide(new Ride(bookingDTO.getRideId()));
         booking.setStatus(BookingStatus.PENDING); // default status
         booking.setEmailSent(false); // email status initially false
+        booking.setDropoffLat(booking.getDropoffLat());
+        booking.setDropoffLng(booking.getDropoffLng());
+        booking.setDropoffLocation(booking.getDropoffLocation());
+        booking.setPickupLat(booking.getPickupLat());
+        booking.setPickupLng(booking.getPickupLng());
+        booking.setPickupLocation(booking.getPickupLocation());
 
         Booking saved = bookingRepository.save(booking);
         return mapToDTO(saved);
@@ -161,6 +167,8 @@ public class BookingService {
         dto.setRideId(booking.getRide().getId()); // Getting the ride ID
         dto.setStatus(booking.getStatus());
         dto.setEmailSent(booking.isEmailSent());
+        dto.setPickupLocation(booking.getPickupLocation());
+        dto.setDropoffLocation(booking.getDropoffLocation());
         return dto;
     }
     public PassengerBookingDTO mapToPassengerDTO(Booking booking) {
