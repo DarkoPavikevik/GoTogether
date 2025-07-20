@@ -21,4 +21,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("SELECT b.ride FROM Booking b WHERE b.user.id = :userId AND " +
             "(b.ride.date > :today OR (b.ride.date = :today AND b.ride.time >= :nowTime))")
     List<Ride> findFutureBookedRides(Long userId, LocalDate today, LocalTime nowTime);
+
+    List<Booking> findByRideId(Long rideId);
+
 }

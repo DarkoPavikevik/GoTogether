@@ -51,4 +51,10 @@ public class BookingController {
         bookingService.requestToJoinRide(bookingRequestDto, principal.getName());
         return ResponseEntity.ok("Booking request sent");
     }
+
+    @GetMapping("/ride/{rideId}")
+    public ResponseEntity<List<BookingDTO>> getBookingsByRideId(@PathVariable Long rideId) {
+        List<BookingDTO> bookings = bookingService.getBookingsByRideId(rideId);
+        return ResponseEntity.ok(bookings);
+    }
 }

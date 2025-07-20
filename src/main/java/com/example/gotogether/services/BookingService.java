@@ -78,6 +78,13 @@ public class BookingService {
         return mapToDTO(booking);
     }
 
+    public List<BookingDTO> getBookingsByRideId(Long rideId) {
+        List<Booking> bookings = bookingRepository.findByRideId(rideId);
+        return bookings.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
     public List<PassengerBookingDTO> getConfirmedPassengersForRide(Long rideId) {
         Ride ride = rideRepository.findById(rideId)
                 .orElseThrow(() -> new ResourceNotFoundException("Ride not found with id " + rideId));
