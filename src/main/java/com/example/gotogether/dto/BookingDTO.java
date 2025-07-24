@@ -21,6 +21,7 @@ public class BookingDTO {
     private BookingStatus status; // e.g., "PENDING", "CONFIRMED", "REJECTED"
     private String pickupLocation;
     private String dropoffLocation;
+    private String note;
     private boolean emailSent;
 }
 

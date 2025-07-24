@@ -107,6 +107,7 @@ public class BookingService {
         booking.setPickupLat(booking.getPickupLat());
         booking.setPickupLng(booking.getPickupLng());
         booking.setPickupLocation(booking.getPickupLocation());
+        booking.setNote(booking.getNote());
 
         Booking saved = bookingRepository.save(booking);
         return mapToDTO(saved);
@@ -151,6 +152,7 @@ public class BookingService {
                 .dropoffLng(dropoffCoords.get(0))
                 .status(BookingStatus.PENDING)
                 .emailSent(true)
+                .note(dto.getNote())
                 .build();
 
         bookingRepository.save(booking);
@@ -169,6 +171,7 @@ public class BookingService {
         dto.setEmailSent(booking.isEmailSent());
         dto.setPickupLocation(booking.getPickupLocation());
         dto.setDropoffLocation(booking.getDropoffLocation());
+        dto.setNote(booking.getNote());
         return dto;
     }
     public PassengerBookingDTO mapToPassengerDTO(Booking booking) {
@@ -186,18 +189,19 @@ public class BookingService {
         Ride ride = rideRepository.findById(rideId)
                 .orElseThrow(() -> new ResourceNotFoundException("Ride not found"));
 
-        List<Booking> bookings = bookingRepository.findByRide(ride);
+        List<Booking> confirmedBookings = bookingRepository.findByRide(ride).stream()
+                .filter(b -> b.getStatus() == BookingStatus.CONFIRMED)
+                .collect(Collectors.toList());
 
-        List<List<Double>> coordinates = bookings.stream()
+        List<List<Double>> coordinates = confirmedBookings.stream()
                 .flatMap(b -> List.of(
                         List.of(b.getPickupLng(), b.getPickupLat()),
                         List.of(b.getDropoffLng(), b.getDropoffLat())
                 ).stream())
                 .collect(Collectors.toList());
 
-        // You can now call ORS directions/optimization APIs with `coordinates`
-        // For now, just return them
         return coordinates;
     }
+
 
 }

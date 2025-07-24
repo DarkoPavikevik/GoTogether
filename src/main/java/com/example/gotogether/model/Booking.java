@@ -39,6 +39,7 @@ public class Booking {
     private Double dropoffLng;
 
     private BookingStatus status; // e.g., "PENDING", "CONFIRMED", "REJECTED"
+    private String note;
 
     private boolean emailSent;
 

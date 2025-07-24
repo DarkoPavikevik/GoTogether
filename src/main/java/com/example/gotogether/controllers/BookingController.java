@@ -57,4 +57,5 @@ public class BookingController {
         List<BookingDTO> bookings = bookingService.getBookingsByRideId(rideId);
         return ResponseEntity.ok(bookings);
     }
+
 }

@@ -4,6 +4,7 @@ import com.example.gotogether.dto.PopularRouteDTO;
 import com.example.gotogether.dto.RideDTO;
 import com.example.gotogether.dto.UserRideDTO;
 import com.example.gotogether.model.Ride;
+import com.example.gotogether.services.BookingService;
 import com.example.gotogether.services.RideService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,6 +24,8 @@ import java.util.List;
 public class RideController {
 
     private final RideService rideService;
+
+    private final BookingService bookingService;
 
     @GetMapping("/{id}")
     public ResponseEntity<RideDTO> getRide(@PathVariable Long id) {
@@ -98,6 +101,12 @@ public class RideController {
     @GetMapping("/future/{userId}")
     public ResponseEntity<List<UserRideDTO>> getFutureRidesForUser(@PathVariable Long userId) {
         return ResponseEntity.ok(rideService.getFutureRidesForUser(userId));
+    }
+
+    @GetMapping("/optimize/{rideId}")
+    public ResponseEntity<List<List<Double>>> optimizeRoute(@PathVariable Long rideId) {
+        List<List<Double>> optimizedCoordinates = bookingService.optimizeRideRoute(rideId);
+        return ResponseEntity.ok(optimizedCoordinates);
     }
 
 
