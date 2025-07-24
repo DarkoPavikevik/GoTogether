@@ -23,8 +23,9 @@ public class ChatMessageController {
     @GetMapping("/conversation")
     public ResponseEntity<List<ChatMessageDTO>> getConversation(
             @RequestParam Long user1Id,
-            @RequestParam Long user2Id
+            @RequestParam Long user2Id,
+            @RequestParam Long rideId
     ) {
-        return ResponseEntity.ok(chatMessageService.getConversation(user1Id, user2Id));
+        return ResponseEntity.ok(chatMessageService.getConversation(user1Id, user2Id, rideId));
     }
 }

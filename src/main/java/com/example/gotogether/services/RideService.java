@@ -129,7 +129,7 @@ public class RideService {
     }
 
 
-    private RideDTO mapToDTO(Ride ride) {
+    RideDTO mapToDTO(Ride ride) {
         UserInfoDTO userInfoDTO = null;
         VehicleDTO vehicleDTO = null;
         List<PassengerBookingDTO> confirmedPassengers = bookingService.getConfirmedPassengersForRide(ride.getId());

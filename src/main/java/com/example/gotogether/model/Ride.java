@@ -58,6 +58,11 @@ public class Ride {
     @JsonIgnore
     private List<Booking> bookings;
 
+    @OneToMany(mappedBy = "ride", cascade = CascadeType.ALL)
+    private List<ChatMessage> messages;
+
+
+
     public Ride(Long id) {
         this.id = id;
     }

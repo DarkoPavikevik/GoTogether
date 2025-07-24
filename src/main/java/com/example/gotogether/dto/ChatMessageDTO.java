@@ -17,6 +17,7 @@ public class ChatMessageDTO {
     private Long receiverId;
     private String message;
     private LocalDateTime timestamp;
+    private Long rideId;
     private RideDTO ride;
 }
 
