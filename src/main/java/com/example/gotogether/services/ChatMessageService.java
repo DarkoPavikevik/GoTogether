@@ -1,6 +1,9 @@
 package com.example.gotogether.services;
 
 import com.example.gotogether.dto.ChatMessageDTO;
+import com.example.gotogether.dto.ParticipantDTO;
+import com.example.gotogether.dto.RideChatDTO;
+import com.example.gotogether.dto.RideDTO;
 import com.example.gotogether.exceptions.ResourceNotFoundException;
 import com.example.gotogether.model.ChatMessage;
 import com.example.gotogether.model.Ride;
@@ -12,7 +15,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -78,6 +83,49 @@ public class ChatMessageService {
                         .timestamp(msg.getTimestamp())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    public RideChatDTO getChatForRide(Long rideId) {
+        Ride ride = rideRepository.findById(rideId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ride not found"));
+
+        List<ChatMessage> messages = chatMessageRepository.findByRideIdOrderByTimestampAsc(rideId);
+
+        // Extract participants
+        Set<User> participants = new HashSet<>();
+        for (ChatMessage msg : messages) {
+            participants.add(msg.getSender());
+            participants.add(msg.getReceiver());
+        }
+
+        // Map to DTO
+        List<ParticipantDTO> participantDTOs = participants.stream().map(user ->
+                ParticipantDTO.builder()
+                        .id(user.getId())
+                        .name(user.getUsername())
+                        .avatar(user.getProfilePicture())
+                        .isDriver(ride.getDriver().getId().equals(user.getId()))
+                        .build()
+        ).toList();
+
+        // Map messages
+        List<ChatMessageDTO> messageDTOs = messages.stream().map(msg ->
+                ChatMessageDTO.builder()
+                        .id(msg.getId())
+                        .senderId(msg.getSender().getId())
+                        .receiverId(msg.getReceiver().getId())
+                        .message(msg.getMessage())
+                        .timestamp(msg.getTimestamp())
+                        .build()
+        ).toList();
+
+        RideDTO rideDTO = rideService.getRideById(rideId); // Assuming this method exists
+
+        return RideChatDTO.builder()
+                .ride(rideDTO)
+                .participants(participantDTOs)
+                .messages(messageDTOs)
+                .build();
     }
 
 

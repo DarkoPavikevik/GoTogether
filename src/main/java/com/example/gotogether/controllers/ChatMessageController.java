@@ -1,6 +1,7 @@
 package com.example.gotogether.controllers;
 
 import com.example.gotogether.dto.ChatMessageDTO;
+import com.example.gotogether.dto.RideChatDTO;
 import com.example.gotogether.services.ChatMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,4 +29,11 @@ public class ChatMessageController {
     ) {
         return ResponseEntity.ok(chatMessageService.getConversation(user1Id, user2Id, rideId));
     }
+
+    @GetMapping("/ride-conversation")
+    public ResponseEntity<RideChatDTO> getRideChat(
+            @RequestParam Long rideId) {
+        return ResponseEntity.ok(chatMessageService.getChatForRide(rideId));
+    }
+
 }
