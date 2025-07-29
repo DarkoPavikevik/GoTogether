@@ -1,6 +1,7 @@
 package com.example.gotogether.controllers;
 
 import com.example.gotogether.dto.ChatMessageDTO;
+import com.example.gotogether.dto.ChatMessageSentDTO;
 import com.example.gotogether.dto.RideChatDTO;
 import com.example.gotogether.services.ChatMessageService;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ public class ChatMessageController {
     public ResponseEntity<ChatMessageDTO> sendMessage(@RequestBody ChatMessageDTO dto) {
         return ResponseEntity.ok(chatMessageService.sendMessage(dto));
     }
+
 
     @GetMapping("/conversation")
     public ResponseEntity<List<ChatMessageDTO>> getConversation(

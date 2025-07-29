@@ -1,10 +1,12 @@
 package com.example.gotogether.services;
 
+import com.example.gotogether.dto.ChatMessageSentDTO;
 import com.example.gotogether.dto.ChatMessageDTO;
 import com.example.gotogether.dto.ParticipantDTO;
 import com.example.gotogether.dto.RideChatDTO;
 import com.example.gotogether.dto.RideDTO;
 import com.example.gotogether.exceptions.ResourceNotFoundException;
+import com.example.gotogether.model.Booking;
 import com.example.gotogether.model.ChatMessage;
 import com.example.gotogether.model.Ride;
 import com.example.gotogether.model.User;
@@ -35,13 +37,21 @@ public class ChatMessageService {
         User sender = userRepository.findById(dto.getSenderId())
                 .orElseThrow(() -> new RuntimeException("Sender not found"));
 
-        User receiver = userRepository.findById(dto.getReceiverId())
-                .orElseThrow(() -> new RuntimeException("Receiver not found"));
+        Ride ride = rideRepository.findById(dto.getRideId())
+                .orElseThrow(() -> new RuntimeException("Ride not found"));
 
-        Ride ride = null;
-        if (dto.getRideId() != null) {
-            ride = rideRepository.findById(dto.getRideId())
-                    .orElseThrow(() -> new RuntimeException("Ride not found"));
+        // Логика за наоѓање на receiver
+        User receiver;
+        if (ride.getDriver().getId().equals(sender.getId())) {
+            // Ако sender е driver, најди патник од bookings
+            Booking passengerBooking = ride.getBookings().stream()
+                    .filter(b -> !b.getUser().getId().equals(sender.getId()))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("No passenger found in this ride"));
+            receiver = passengerBooking.getUser();
+        } else {
+            // Ако sender е патник, тогаш receiver е driver
+            receiver = ride.getDriver();
         }
 
         ChatMessage message = ChatMessage.builder()
@@ -58,12 +68,13 @@ public class ChatMessageService {
                 .id(saved.getId())
                 .senderId(sender.getId())
                 .receiverId(receiver.getId())
-                .rideId(ride != null ? ride.getId() : null)
-                .ride(ride != null ? rideService.mapToDTO(ride) : null) // Optional: Include full ride info
+                .rideId(ride.getId())
                 .message(saved.getMessage())
                 .timestamp(saved.getTimestamp())
                 .build();
     }
+
+
 
 
     public List<ChatMessageDTO> getConversation(Long user1Id, Long user2Id, Long rideId) {
