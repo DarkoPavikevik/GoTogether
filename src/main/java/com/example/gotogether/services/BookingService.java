@@ -117,6 +117,18 @@ public class BookingService {
         Booking existingBooking = bookingRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found with id " + id));
 
+        if (bookingDTO.getStatus() == BookingStatus.CONFIRMED &&
+                existingBooking.getStatus() != BookingStatus.CONFIRMED) {
+
+            Ride ride = existingBooking.getRide();
+            if (ride.getSeatsAvailable() > 0) {
+                ride.setSeatsAvailable(ride.getSeatsAvailable() - 1);
+                rideRepository.save(ride);
+            } else {
+                throw new IllegalStateException("No available seats for this ride");
+            }
+        }
+
         existingBooking.setStatus(bookingDTO.getStatus());
         existingBooking.setEmailSent(bookingDTO.isEmailSent());
 
