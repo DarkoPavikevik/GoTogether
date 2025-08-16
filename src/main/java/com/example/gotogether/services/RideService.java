@@ -73,6 +73,7 @@ public class RideService {
 
         Ride ride = mapToEntity(rideDTO);
         ride.setDriver(driver);
+        ride.setStatus("ACTIVE");
 
         Ride saved = rideRepository.save(ride);
         return mapToDTO(saved);

@@ -3,6 +3,7 @@ package com.example.gotogether.controllers;
 import com.example.gotogether.dto.BookingDTO;
 import com.example.gotogether.dto.BookingReuquestDTO;
 import com.example.gotogether.model.Booking;
+import com.example.gotogether.security.JwtUtil;
 import com.example.gotogether.services.BookingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ public class BookingController {
 
 
     private final BookingService bookingService;
+    private final JwtUtil jwtUtil;
 
 
     @GetMapping("")
@@ -47,8 +49,16 @@ public class BookingController {
     }
 
     @PostMapping("/request")
-    public ResponseEntity<?> requestToJoinRide(@RequestBody BookingReuquestDTO bookingRequestDto, Principal principal) {
-        bookingService.requestToJoinRide(bookingRequestDto, principal.getName());
+    public ResponseEntity<?> requestToJoinRide(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody BookingReuquestDTO bookingRequestDto) {
+
+        // Izvlekuvanje na tokenot
+        String token = authHeader.replace("Bearer ", "");
+        String username = jwtUtil.extractUsername(token); // koristi jwtUtil
+
+        bookingService.requestToJoinRide(bookingRequestDto, username);
+
         return ResponseEntity.ok("Booking request sent");
     }
 
