@@ -72,6 +72,13 @@ public class BookingService {
                 .collect(Collectors.toList());
     }
 
+    public List<BookingDTO> getBookingsForDriver(String username) {
+        List<Booking> bookings = bookingRepository.findAllBookingsForDriver(username);
+        return bookings.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
     public BookingDTO getBookingById(Long id) {
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found with id " + id));

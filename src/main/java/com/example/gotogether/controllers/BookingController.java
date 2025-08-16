@@ -68,4 +68,16 @@ public class BookingController {
         return ResponseEntity.ok(bookings);
     }
 
+    @GetMapping("/my-notifications")
+    public ResponseEntity<List<BookingDTO>> getMyNotifications(
+            @RequestHeader("Authorization") String authHeader) {
+
+        String token = authHeader.replace("Bearer ", "");
+        String username = jwtUtil.extractUsername(token);
+
+        List<BookingDTO> bookings = bookingService.getBookingsForDriver(username);
+        return ResponseEntity.ok(bookings);
+    }
+
+
 }

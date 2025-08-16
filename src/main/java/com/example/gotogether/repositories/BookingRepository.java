@@ -4,6 +4,7 @@ import com.example.gotogether.model.Booking;
 import com.example.gotogether.model.Ride;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -23,5 +24,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Ride> findFutureBookedRides(Long userId, LocalDate today, LocalTime nowTime);
 
     List<Booking> findByRideId(Long rideId);
+
+    // vrakja booking-ite za ride koi gi poseduva logiraniot driver
+    @Query("SELECT b FROM Booking b WHERE b.ride.driver.username = :username")
+    List<Booking> findAllBookingsForDriver(@Param("username") String username);
 
 }
