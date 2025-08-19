@@ -204,23 +204,6 @@ public class BookingService {
                 .build();
     }
 
-    public List<List<Double>> optimizeRideRoute(Long rideId) {
-        Ride ride = rideRepository.findById(rideId)
-                .orElseThrow(() -> new ResourceNotFoundException("Ride not found"));
-
-        List<Booking> confirmedBookings = bookingRepository.findByRide(ride).stream()
-                .filter(b -> b.getStatus() == BookingStatus.CONFIRMED)
-                .collect(Collectors.toList());
-
-        List<List<Double>> coordinates = confirmedBookings.stream()
-                .flatMap(b -> List.of(
-                        List.of(b.getPickupLng(), b.getPickupLat()),
-                        List.of(b.getDropoffLng(), b.getDropoffLat())
-                ).stream())
-                .collect(Collectors.toList());
-
-        return coordinates;
-    }
 
 
 }

@@ -1,6 +1,7 @@
 package com.example.gotogether.services;
 
 import com.example.gotogether.dto.*;
+import com.example.gotogether.enums.BookingStatus;
 import com.example.gotogether.enums.Currency;
 import com.example.gotogether.enums.LuggageSize;
 import com.example.gotogether.exceptions.ResourceNotFoundException;
@@ -19,12 +20,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.example.gotogether.model.RideSpecification.*;
 
@@ -251,6 +254,59 @@ public class RideService {
         Pageable pageable = PageRequest.of(0, limit);
         return rideRepository.findTopPopularRoutes(pageable);
     }
+
+    public List<String> optimizeRideRoute(Long rideId, String username, DriverRouteDTO driverRouteDTO)
+            throws AccessDeniedException, ResourceNotFoundException {
+
+
+        if (driverRouteDTO.getStart() == null || driverRouteDTO.getStart().isEmpty() ||
+                driverRouteDTO.getEnd() == null || driverRouteDTO.getEnd().isEmpty()) {
+            throw new IllegalArgumentException("Start and end locations must be provided");
+        }
+
+        Ride ride = rideRepository.findById(rideId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ride not found with id " + rideId));
+
+
+        if (!ride.getDriver().getUsername().equals(username)) {
+            throw new AccessDeniedException("Only the driver can optimize the route");
+        }
+
+
+        List<String> pickups = new ArrayList<>();
+        List<String> dropoffs = new ArrayList<>();
+
+        if (ride.getBookings() != null) {
+            ride.getBookings().stream()
+                    .filter(b -> b != null && b.getStatus() == BookingStatus.CONFIRMED)
+                    .forEach(b -> {
+                        if (b.getPickupLocation() != null && !b.getPickupLocation().isEmpty()) {
+                            pickups.add(b.getPickupLocation());
+                        }
+                        if (b.getDropoffLocation() != null && !b.getDropoffLocation().isEmpty()) {
+                            dropoffs.add(b.getDropoffLocation());
+                        }
+                    });
+        }
+
+
+        List<String> fullRoute = new ArrayList<>();
+        fullRoute.add(driverRouteDTO.getStart());
+        fullRoute.addAll(pickups);
+
+        // Add all ride waypoints if exist
+        if (ride.getWaypoints() != null && !ride.getWaypoints().isEmpty()) {
+            fullRoute.addAll(ride.getWaypoints());
+        }
+
+        fullRoute.addAll(dropoffs);               // Then dropoffs
+        fullRoute.add(driverRouteDTO.getEnd());   // End
+
+        return fullRoute;
+    }
+
+
+
 
 
 }

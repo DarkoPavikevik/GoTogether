@@ -1,31 +1,40 @@
 package com.example.gotogether.controllers;
 
+import com.example.gotogether.dto.DriverRouteDTO;
 import com.example.gotogether.dto.PopularRouteDTO;
 import com.example.gotogether.dto.RideDTO;
 import com.example.gotogether.dto.UserRideDTO;
+import com.example.gotogether.exceptions.ResourceNotFoundException;
 import com.example.gotogether.model.Ride;
+import com.example.gotogether.security.JwtUtil;
 import com.example.gotogether.services.BookingService;
 import com.example.gotogether.services.RideService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDate;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/rides")
 @RequiredArgsConstructor
+@Slf4j
 public class RideController {
 
     private final RideService rideService;
 
     private final BookingService bookingService;
+
+    private final JwtUtil jwtUtil;
 
     @GetMapping("/{id}")
     public ResponseEntity<RideDTO> getRide(@PathVariable Long id) {
@@ -103,10 +112,24 @@ public class RideController {
         return ResponseEntity.ok(rideService.getFutureRidesForUser(userId));
     }
 
-    @GetMapping("/optimize/{rideId}")
-    public ResponseEntity<List<List<Double>>> optimizeRoute(@PathVariable Long rideId) {
-        List<List<Double>> optimizedCoordinates = bookingService.optimizeRideRoute(rideId);
-        return ResponseEntity.ok(optimizedCoordinates);
+    @PostMapping("/{rideId}/optimize")
+    public ResponseEntity<?> optimizeRoute(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable Long rideId,
+            @RequestBody DriverRouteDTO driverRouteDTO) {
+        try {
+            String username = jwtUtil.extractUsername(authHeader.replace("Bearer ", ""));
+            List<String> optimizedRoute = rideService.optimizeRideRoute(rideId, username, driverRouteDTO);
+            return ResponseEntity.ok(optimizedRoute);
+        } catch (AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            log.error("Error optimizing route for ride {}: {}", rideId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error optimizing route: " + e.getMessage());
+        }
     }
 
 
