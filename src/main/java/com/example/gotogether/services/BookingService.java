@@ -157,6 +157,14 @@ public class BookingService {
         Ride ride = rideRepository.findById(dto.getRideId())
                 .orElseThrow(() -> new RuntimeException("Ride not found"));
 
+        // 🚨 Prevent duplicate booking
+        boolean alreadyBooked = ride.getBookings().stream()
+                .anyMatch(b -> b.getUser().getId().equals(user.getId()));
+
+        if (alreadyBooked) {
+            throw new RuntimeException("You already have a booking for this ride");
+        }
+
         List<Double> pickupCoords = getCoordinates(dto.getPickupLocation());
         List<Double> dropoffCoords = getCoordinates(dto.getDropoffLocation());
 
@@ -178,6 +186,7 @@ public class BookingService {
 
         emailService.sendBookingRequestEmail(ride.getDriver(), user, ride);
     }
+
 
     public BookingDTO mapToDTO(Booking booking) {
         BookingDTO dto = new BookingDTO();

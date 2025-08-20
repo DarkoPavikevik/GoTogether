@@ -8,10 +8,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Table(name = "users")
 @Entity
@@ -74,6 +71,10 @@ public class User {
     @JsonManagedReference
     private List<Review> reviews;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Booking> bookings = new ArrayList<>();
+
 
 
     public User(Long id) {
@@ -84,6 +85,30 @@ public class User {
     protected void onCreate() {
         this.created = LocalDate.now();
     }
+
+    public List<LocalDate> getAllRideDates() {
+        Set<LocalDate> allDates = new HashSet<>();
+
+        // Датуми каде корисникот е возач
+        if (this.rides != null) {
+            for (Ride ride : this.rides) {
+                allDates.add(ride.getDate());
+            }
+        }
+
+        // Датуми каде корисникот е патник (преку Booking)
+        if (this.bookings != null) {
+            for (Booking booking : this.bookings) {
+                if (booking.getRide() != null) {
+                    allDates.add(booking.getRide().getDate());
+                }
+            }
+        }
+
+        return new ArrayList<>(allDates);
+    }
+
+
 
 
 }
